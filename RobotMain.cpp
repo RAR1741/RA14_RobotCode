@@ -1,31 +1,19 @@
 #include "WPILib.h"
 
-/**
- * This is a demo program showing the use of the RobotBase class.
- * The IterativeRobot class is the base of a robot application that will automatically call your
- * Periodic methods for each packet based on the mode.
- */ 
-class RobotDemo : public IterativeRobot
+class RA14Robot : public IterativeRobot
 {
-	RobotDrive myRobot; // robot drive system
-	Joystick stick; // only joystick
-
 public:
-	RobotDemo():
-		myRobot(1, 2),	// these must be initialized in the same order
-		stick(1)		// as they are declared above.
-	{
-		myRobot.SetExpiration(0.1);
-		this->SetPeriod(0); 	//Set update period to sync with robot control packets (20ms nominal)
-	}
-	
+  RA14Robot():
+  {
+  }
+  
 /**
  * Robot-wide initialization code should go here.
  * 
  * Use this method for default Robot-wide initialization which will
  * be called when the robot is first powered on.  It will be called exactly 1 time.
  */
-void RobotDemo::RobotInit() {
+void RA14Robot::RobotInit() {
 }
 
 /**
@@ -34,7 +22,7 @@ void RobotDemo::RobotInit() {
  * Use this method for initialization code which will be called each time
  * the robot enters disabled mode. 
  */
-void RobotDemo::DisabledInit() {
+void RA14Robot::DisabledInit() {
 }
 
 /**
@@ -43,7 +31,7 @@ void RobotDemo::DisabledInit() {
  * Use this method for code which will be called periodically at a regular
  * rate while the robot is in disabled mode.
  */
-void RobotDemo::DisabledPeriodic() {
+void RA14Robot::DisabledPeriodic() {
 }
 
 /**
@@ -52,7 +40,7 @@ void RobotDemo::DisabledPeriodic() {
  * Use this method for initialization code which will be called each time
  * the robot enters autonomous mode.
  */
-void RobotDemo::AutonomousInit() {
+void RA14Robot::AutonomousInit() {
 }
 
 /**
@@ -61,7 +49,7 @@ void RobotDemo::AutonomousInit() {
  * Use this method for code which will be called periodically at a regular
  * rate while the robot is in autonomous mode.
  */
-void RobotDemo::AutonomousPeriodic() {
+void RA14Robot::AutonomousPeriodic() {
 }
 
 /**
@@ -70,7 +58,7 @@ void RobotDemo::AutonomousPeriodic() {
  * Use this method for initialization code which will be called each time
  * the robot enters teleop mode.
  */
-void RobotDemo::TeleopInit() {
+void RA14Robot::TeleopInit() {
 }
 
 /**
@@ -79,8 +67,7 @@ void RobotDemo::TeleopInit() {
  * Use this method for code which will be called periodically at a regular
  * rate while the robot is in teleop mode.
  */
-void RobotDemo::TeleopPeriodic() {
-	myRobot.ArcadeDrive(stick); // drive with arcade style 
+void RA14Robot::TeleopPeriodic() {
 }
 
 /**
@@ -89,7 +76,7 @@ void RobotDemo::TeleopPeriodic() {
  * Use this method for initialization code which will be called each time
  * the robot enters test mode.
  */
-void RobotDemo::TestInit() {
+void RA14Robot::TestInit() {
 }
 
 /**
@@ -98,10 +85,10 @@ void RobotDemo::TestInit() {
  * Use this method for code which will be called periodically at a regular
  * rate while the robot is in test mode.
  */
-void RobotDemo::TestPeriodic() {
+void RA14Robot::TestPeriodic() {
 }
 
 };
 
-START_ROBOT_CLASS(RobotDemo);
+START_ROBOT_CLASS(RA14Robot);
 
