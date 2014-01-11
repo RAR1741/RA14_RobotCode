@@ -3,7 +3,7 @@
 class RA14Robot : public IterativeRobot
 {
 public:
-  RA14Robot():
+  RA14Robot()
   {
   }
   
