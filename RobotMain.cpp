@@ -2,9 +2,25 @@
 
 class RA14Robot : public IterativeRobot
 {
+	
+	
+private:
+	
+	
+	
+	
+	
+	
 public:
   RA14Robot()
   {
+	  
+	  
+	  
+	  
+	  
+	  
+	  
   }
   
 /**
@@ -14,6 +30,18 @@ public:
  * be called when the robot is first powered on.  It will be called exactly 1 time.
  */
 void RA14Robot::RobotInit() {
+	
+	SmartDashboard::init();
+	cout << "2014 Red Alert Robot" << endl;
+	cout << "Compiled on: ";
+	cout << __DATE__ << " at " << __TIME__ << endl;
+	
+	
+	
+	
+	
+	
+	cout << "Robot Init Complete..." << endl;
 }
 
 /**
