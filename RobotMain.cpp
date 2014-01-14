@@ -1,12 +1,24 @@
 #include "WPILib.h"
+#include "DriveTrain.h"
+#include <cstdio>
+#include <iomanip>
+#include <iostream>
+#include <fstream>
+#include "Gamepad.h"
+
 
 class RA14Robot : public IterativeRobot
 {
 	
 	
 private:
-	
-	
+	DriveTrain * myDrive;
+	Gamepad * DriverGamepad;
+	Gamepad * OperatorGamepad;
+	float DriverLeftY;
+	float DriverLeftX;
+	float DriverRightY;
+	float DriverRightX;
 	
 	
 	
@@ -14,8 +26,9 @@ private:
 public:
   RA14Robot()
   {
-	  
-	  
+	myDrive = NULL;  
+	DriverGamepad = NULL;
+	OperatorGamepad = NULL;	
 	  
 	  
 	  
@@ -35,7 +48,9 @@ void RA14Robot::RobotInit() {
 	cout << "2014 Red Alert Robot" << endl;
 	cout << "Compiled on: ";
 	cout << __DATE__ << " at " << __TIME__ << endl;
-	
+	myDrive = new DriveTrain(1,2,3,4,1,2,3,4);
+	DriverGamepad = new Gamepad(1);
+	OperatorGamepad = new Gamepad(2);
 	
 	
 	
@@ -96,6 +111,22 @@ void RA14Robot::TeleopInit() {
  * rate while the robot is in teleop mode.
  */
 void RA14Robot::TeleopPeriodic() {
+	
+	DriverLeftY = DriverGamepad->GetLeftY();
+	DriverRightY = DriverGamepad->GetRightY();
+	
+	
+	
+	
+	
+	
+	myDrive->Drive(DriverLeftY, DriverRightY);
+	
+	
+	
+	
+	
+	
 }
 
 /**
