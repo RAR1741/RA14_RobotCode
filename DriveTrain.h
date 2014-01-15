@@ -13,8 +13,8 @@ public:
 	
 	//Drive functions
 	void Drive(double LeftStickY, double RightStickY);
-	void ShiftUp (void);		
-	void ShiftDown (void);
+	void ShiftUp (bool GetRightBumper);		
+	void ShiftDown (bool GetLeftBumper);
 	void logHeaders(ostream &f);
 	void log(std::ostream &f);
 private:

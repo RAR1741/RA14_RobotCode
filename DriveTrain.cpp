@@ -34,12 +34,12 @@ void DriveTrain::Drive(double LeftStickY, double RightStickY)
 	RRMotor->Set(DeadZone(RightStickY));
 	
 }
-void DriveTrain::ShiftUp(void)
+void DriveTrain::ShiftUp(bool GetRightBumper)
 {
 	LeftSol->Set(DoubleSolenoid::kReverse);
 	RightSol->Set(DoubleSolenoid::kReverse);
 }
-void DriveTrain::ShiftDown(void)
+void DriveTrain::ShiftDown(bool GetLeftBumper)
 {
 	LeftSol->Set(DoubleSolenoid::kForward);
 	RightSol->Set(DoubleSolenoid::kForward);

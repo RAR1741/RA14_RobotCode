@@ -29,7 +29,7 @@ public:
 	myDrive = NULL;  
 	DriverGamepad = NULL;
 	OperatorGamepad = NULL;	
-	  
+	 
 	  
 	  
 	  
@@ -49,9 +49,11 @@ void RA14Robot::RobotInit() {
 	cout << "Compiled on: ";
 	cout << __DATE__ << " at " << __TIME__ << endl;
 	myDrive = new DriveTrain(1,2,3,4,1,2,3,4);
+	
+	cout << "Initializing gamepads..." << endl;
 	DriverGamepad = new Gamepad(1);
 	OperatorGamepad = new Gamepad(2);
-	
+	cout << "Gamepads initialized." << endl;
 	
 	
 	
