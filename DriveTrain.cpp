@@ -9,10 +9,10 @@ using namespace std;
 
 DriveTrain::DriveTrain(int fl, int fr, int rl, int rr,int leftsolforward,int leftsolreverse,int rightsolforward,int rightsolreverse)
 {
-	FLMotor = new Talon(fl);
-	FRMotor = new Talon(fr);
-	RLMotor = new Talon(rl);
-	RRMotor = new Talon(rr);
+	FLMotor = new Talon(6);
+	FRMotor = new Talon(7);
+	//RLMotor = new Talon(rl);
+	//RRMotor = new Talon(rr);
 	LeftSol = new DoubleSolenoid(leftsolforward,leftsolreverse);
 	RightSol = new DoubleSolenoid(rightsolforward,rightsolreverse);
 	
@@ -21,7 +21,6 @@ DriveTrain::DriveTrain(int fl, int fr, int rl, int rr,int leftsolforward,int lef
 
 DriveTrain::~DriveTrain()
 {
-	
 }
 
 
@@ -34,12 +33,12 @@ void DriveTrain::Drive(double LeftStickY, double RightStickY)
 	RRMotor->Set(DeadZone(RightStickY));
 	
 }
-void DriveTrain::ShiftUp(bool GetRightBumper)
+void DriveTrain::ShiftUp() //Shifts to the higher gear
 {
 	LeftSol->Set(DoubleSolenoid::kReverse);
 	RightSol->Set(DoubleSolenoid::kReverse);
 }
-void DriveTrain::ShiftDown(bool GetLeftBumper)
+void DriveTrain::ShiftDown() //Shifts to the lower gear
 {
 	LeftSol->Set(DoubleSolenoid::kForward);
 	RightSol->Set(DoubleSolenoid::kForward);
@@ -73,8 +72,8 @@ void DriveTrain::log(ostream &f)
 }
 
 
-float DriveTrain::DeadZone(float input) {
-	if (::fabs(input) <= 0.05)return 0;
+float DriveTrain::DeadZone(float input) { //Returns 0 if joystick inputs are within certain range
+	if (::fabs(input) <= 0.05)return 0; //Range is set to +- 5% of the center
 	return input;
 }
 

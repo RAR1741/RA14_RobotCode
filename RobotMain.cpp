@@ -7,6 +7,7 @@
 #include "Gamepad.h"
 
 
+
 class RA14Robot : public IterativeRobot
 {
 	
@@ -16,10 +17,9 @@ private:
 	Gamepad * DriverGamepad;
 	Gamepad * OperatorGamepad;
 	float DriverLeftY;
-	float DriverLeftX;
 	float DriverRightY;
-	float DriverRightX;
-	
+	bool DriverLeftBumper;
+	bool DriverRightBumper;
 	
 	
 	
@@ -29,8 +29,10 @@ public:
 	myDrive = NULL;  
 	DriverGamepad = NULL;
 	OperatorGamepad = NULL;	
-	 
-	  
+	DriverLeftY = 0.0;
+	DriverRightY = 0.0;  
+	DriverLeftBumper = true;
+	DriverRightBumper = true;
 	  
 	  
 	  
@@ -112,23 +114,14 @@ void RA14Robot::TeleopInit() {
  * Use this method for code which will be called periodically at a regular
  * rate while the robot is in teleop mode.
  */
-void RA14Robot::TeleopPeriodic() {
+void RA14Robot::TeleopPeriodic() 
+{
 	
 	DriverLeftY = DriverGamepad->GetLeftY();
 	DriverRightY = DriverGamepad->GetRightY();
-	
-	
-	
-	
-	
-	
-	myDrive->Drive(DriverLeftY, DriverRightY);
-	
-	
-	
-	
-	
-	
+	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
+	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
+	myDrive->Drive(DriverLeftY, DriverRightY); 
 }
 
 /**
