@@ -9,8 +9,8 @@ using namespace std;
 
 DriveTrain::DriveTrain(int fl, int fr, int rl, int rr,int leftsolforward,int leftsolreverse,int rightsolforward,int rightsolreverse)
 {
-	FLMotor = new Talon(6);
-	FRMotor = new Talon(7);
+	FLMotor = new Talon(fl);
+	FRMotor = new Talon(fr);
 	//RLMotor = new Talon(rl);
 	//RRMotor = new Talon(rr);
 	LeftSol = new DoubleSolenoid(leftsolforward,leftsolreverse);
@@ -37,12 +37,13 @@ void DriveTrain::ShiftUp() //Shifts to the higher gear
 {
 	LeftSol->Set(DoubleSolenoid::kReverse);
 	RightSol->Set(DoubleSolenoid::kReverse);
+	cout<<"ShiftUp"<<endl;
 }
 void DriveTrain::ShiftDown() //Shifts to the lower gear
 {
 	LeftSol->Set(DoubleSolenoid::kForward);
 	RightSol->Set(DoubleSolenoid::kForward);
-	
+	cout<<"ShiftDown"<<endl;
 }
 void DriveTrain::logHeaders(ostream &f)
 {

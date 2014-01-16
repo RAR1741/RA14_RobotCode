@@ -57,9 +57,6 @@ void RA14Robot::RobotInit() {
 	OperatorGamepad = new Gamepad(2);
 	cout << "Gamepads initialized." << endl;
 	
-	
-	
-	
 	cout << "Robot Init Complete..." << endl;
 }
 
@@ -121,7 +118,17 @@ void RA14Robot::TeleopPeriodic()
 	DriverRightY = DriverGamepad->GetRightY();
 	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
 	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
-	myDrive->Drive(DriverLeftY, DriverRightY); 
+	
+	if(DriverLeftBumper)
+	{
+		myDrive->ShiftUp();
+	}
+	else if(DriverRightBumper)
+	{
+		myDrive->ShiftDown();
+	}
+	
+	myDrive->Drive(DriverLeftY, DriverRightY);
 }
 
 /**
