@@ -16,6 +16,7 @@ private:
 	DriveTrain * myDrive;
 	Gamepad * DriverGamepad;
 	Gamepad * OperatorGamepad;
+	Compressor * myCompressor;
 	float DriverLeftY;
 	float DriverRightY;
 	bool DriverLeftBumper;
@@ -29,6 +30,7 @@ public:
 	myDrive = NULL;  
 	DriverGamepad = NULL;
 	OperatorGamepad = NULL;	
+	myCompressor = NULL;
 	DriverLeftY = 0.0;
 	DriverRightY = 0.0;  
 	DriverLeftBumper = true;
@@ -50,7 +52,13 @@ void RA14Robot::RobotInit() {
 	cout << "2014 Red Alert Robot" << endl;
 	cout << "Compiled on: ";
 	cout << __DATE__ << " at " << __TIME__ << endl;
-	myDrive = new DriveTrain(1,2,3,4,1,2,3,4);
+	
+	
+	
+	myCompressor = new Compressor(11,1);
+	
+	//myDrive = new DriveTrain(1,2,3,4,1,2,3,4);
+	myDrive = new DriveTrain(6,2,7,4,1,2,3,4 );
 	
 	cout << "Initializing gamepads..." << endl;
 	DriverGamepad = new Gamepad(1);
@@ -69,6 +77,8 @@ void RA14Robot::RobotInit() {
  * the robot enters disabled mode. 
  */
 void RA14Robot::DisabledInit() {
+	myCompressor->Stop();
+	
 }
 
 /**
@@ -105,6 +115,7 @@ void RA14Robot::AutonomousPeriodic() {
  * the robot enters teleop mode.
  */
 void RA14Robot::TeleopInit() {
+	myCompressor->Start();
 }
 
 /**
