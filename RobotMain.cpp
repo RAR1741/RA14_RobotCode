@@ -58,6 +58,8 @@ void RA14Robot::RobotInit() {
 	cout << "Gamepads initialized." << endl;
 	
 	cout << "Robot Init Complete..." << endl;
+	
+	
 }
 
 /**

@@ -11,8 +11,8 @@ DriveTrain::DriveTrain(int fl, int fr, int rl, int rr,int leftsolforward,int lef
 {
 	FLMotor = new Talon(fl);
 	FRMotor = new Talon(fr);
-	//RLMotor = new Talon(rl);
-	//RRMotor = new Talon(rr);
+	RLMotor = new Talon(rl);
+	RRMotor = new Talon(rr);
 	LeftSol = new DoubleSolenoid(leftsolforward,leftsolreverse);
 	RightSol = new DoubleSolenoid(rightsolforward,rightsolreverse);
 	
