@@ -8,7 +8,7 @@ class DriveTrain
 {
 public:
 	//Constructors and deconstructors
-	DriveTrain(int fl, int fr, int rl, int rr,int leftsolforward,int leftsolreverse,int rightsolforward,int rightsolreverse);
+	DriveTrain(int fl, int rl, int fr, int rr, int leftsolforward,int leftsolreverse,int rightsolforward,int rightsolreverse);
 	~DriveTrain();
 	
 	//Drive functions

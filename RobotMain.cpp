@@ -57,8 +57,8 @@ void RA14Robot::RobotInit() {
 	
 	myCompressor = new Compressor(11,1);
 	
-	//myDrive = new DriveTrain(1,2,3,4,1,2,3,4);
-	myDrive = new DriveTrain(6,2,7,4,1,2,3,4 );
+	myDrive = new DriveTrain(1,2,3,4,1,2,3,4);
+	//myDrive = new DriveTrain(6,2,7,4,1,2,3,4 );
 	
 	cout << "Initializing gamepads..." << endl;
 	DriverGamepad = new Gamepad(1);

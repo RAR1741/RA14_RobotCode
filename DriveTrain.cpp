@@ -7,7 +7,7 @@
 using namespace std;
 
 
-DriveTrain::DriveTrain(int fl, int fr, int rl, int rr,int leftsolforward,int leftsolreverse,int rightsolforward,int rightsolreverse)
+DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward,int leftsolreverse,int rightsolforward,int rightsolreverse)
 {
 	FLMotor = new Talon(fl);
 	FRMotor = new Talon(fr);
