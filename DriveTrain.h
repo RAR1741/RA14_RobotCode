@@ -8,7 +8,10 @@ class DriveTrain
 {
 public:
 	//Constructors and deconstructors
-	DriveTrain(int fl, int rl, int fr, int rr, int leftsolforward,int leftsolreverse,int rightsolforward,int rightsolreverse);
+	DriveTrain(int fl, int rl, int fr, int rr, int leftsolforward,
+			int leftsolreverse,int rightsolforward,int rightsolreverse,
+			int leftencoder_a, int leftencoder_b,
+			int rightencoder_a, int rightencoder_b);
 	~DriveTrain();
 	
 	//Drive functions
@@ -17,6 +20,8 @@ public:
 	void ShiftDown();
 	void logHeaders(ostream &f);
 	void log(std::ostream &f);
+	
+	void Debug(std::ostream &f);
 private:
 
 	DoubleSolenoid * LeftSol;
@@ -25,8 +30,13 @@ private:
 	Talon * FRMotor;
 	Talon * RLMotor;
 	Talon * RRMotor;
+	
+	Encoder * LEncoder;
+	Encoder * REncoder;
 
 	float DeadZone(float input);
+	
+	void ConfigureEncoder(Encoder *e);
 	
 };
 #endif
