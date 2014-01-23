@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <iomanip>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -30,8 +31,8 @@ DriveTrain::~DriveTrain()
 
 void DriveTrain::Debug(ostream & out) 
 {
-	out << "Left: " << LEncoder->GetRate();
-	out << "\tRight: " << REncoder->GetRate();
+	out << "Left: " << setw(10) << LEncoder->GetRate();
+	out << "Right: " << setw(10) << REncoder->GetRate();
 	out << endl;
 }
 
@@ -85,7 +86,7 @@ void DriveTrain::log(ostream &f)
 
 
 float DriveTrain::DeadZone(float input) { //Returns 0 if joystick inputs are within certain range
-	if (::fabs(input) <= 0.1)return 0; //Range is set to +- 5% of the center
+	if (::fabs(input) <= 0.1)return 0; //Range is set to +- 10% of the center
 	return input;
 }
 

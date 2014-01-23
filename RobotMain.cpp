@@ -1,5 +1,6 @@
 #include "WPILib.h"
 #include "DriveTrain.h"
+#include "CamShooter.h"
 #include <cstdio>
 #include <iomanip>
 #include <iostream>
@@ -9,6 +10,7 @@
 class RA14Robot : public IterativeRobot
 {
 private:
+	Encoder * myCamEncoder;
 	DriveTrain * myDrive;
 	Gamepad * DriverGamepad;
 	Gamepad * OperatorGamepad;
@@ -21,6 +23,7 @@ private:
 public:
   RA14Robot()
   {
+	myCamEncoder = NULL;
 	myDrive = NULL;  
 	DriverGamepad = NULL;
 	OperatorGamepad = NULL;	
@@ -44,7 +47,8 @@ void RA14Robot::RobotInit() {
 	cout << "Compiled on: ";
 	cout << __DATE__ << " at " << __TIME__ << endl;
 	
-	
+	myCamEncoder = new Encoder(5,6,false,Encoder::k4X);
+	myCamEncoder->Start();
 	
 	myCompressor = new Compressor(11,1);
 	
@@ -69,6 +73,7 @@ void RA14Robot::RobotInit() {
  */
 void RA14Robot::DisabledInit() {
 	myCompressor->Stop();
+	myCamEncoder->Stop();
 	
 }
 

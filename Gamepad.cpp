@@ -15,7 +15,7 @@ Gamepad::Gamepad(UINT32 port)
     ap_ds = DriverStation::GetInstance();
 }
 
-Gamepad::~Gamepad()
+Gamepad::~Gamepad()   
 {
 }
 
