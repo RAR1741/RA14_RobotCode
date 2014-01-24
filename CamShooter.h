@@ -10,17 +10,17 @@
 class CamShooter
 {
 public:
-	CamShooter();
+	CamShooter(int jag1);
 	~CamShooter();
 	
 	//Functions
-	void ResetEncoder(Encoder * myCamEncoder);
+	void DisplayPosition();
 	void Shoot();
 	void logHeaders(ostream &f);
 	void log(std::ostream &f);
 	void Debug(std::ostream &f);
 		
 private:
-	
+	CANJaguar * ShooterJag;
 	
 };

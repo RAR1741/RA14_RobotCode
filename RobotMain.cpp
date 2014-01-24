@@ -7,10 +7,12 @@
 #include <fstream>
 #include "Gamepad.h"
 
+using namespace std;
+
 class RA14Robot : public IterativeRobot
 {
 private:
-	Encoder * myCamEncoder;
+	CamShooter * myCam;
 	DriveTrain * myDrive;
 	Gamepad * DriverGamepad;
 	Gamepad * OperatorGamepad;
@@ -23,7 +25,7 @@ private:
 public:
   RA14Robot()
   {
-	myCamEncoder = NULL;
+	myCam = NULL;
 	myDrive = NULL;  
 	DriverGamepad = NULL;
 	OperatorGamepad = NULL;	
@@ -47,10 +49,9 @@ void RA14Robot::RobotInit() {
 	cout << "Compiled on: ";
 	cout << __DATE__ << " at " << __TIME__ << endl;
 	
-	myCamEncoder = new Encoder(5,6,false,Encoder::k4X);
-	myCamEncoder->Start();
-	
 	myCompressor = new Compressor(11,1);
+	
+	myCam = new CamShooter(9);
 	
 	myDrive = new DriveTrain(1,2,3,4,1,2,3,4,1,2,3,4);
 	//myDrive = new DriveTrain(6,2,7,4,1,2,3,4 );
@@ -73,7 +74,6 @@ void RA14Robot::RobotInit() {
  */
 void RA14Robot::DisabledInit() {
 	myCompressor->Stop();
-	myCamEncoder->Stop();
 	
 }
 
@@ -140,6 +140,8 @@ void RA14Robot::TeleopPeriodic()
 	myDrive->Drive(DriverLeftY, DriverRightY);
 	
 	myDrive->Debug(cout);
+	
+	myCam->DisplayPosition();
 }
 
 /**

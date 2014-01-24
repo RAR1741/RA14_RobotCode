@@ -49,14 +49,28 @@ void DriveTrain::ShiftUp() //Shifts to the higher gear
 {
 	LeftSol->Set(DoubleSolenoid::kReverse);
 	RightSol->Set(DoubleSolenoid::kReverse);
-	cout<<"ShiftUp"<<endl;
+	//cout<<"ShiftUp"<<endl;
 }
 void DriveTrain::ShiftDown() //Shifts to the lower gear
 {
 	LeftSol->Set(DoubleSolenoid::kForward);
 	RightSol->Set(DoubleSolenoid::kForward);
-	cout<<"ShiftDown"<<endl;
+	//cout<<"ShiftDown"<<endl;
 }
+
+float DriveTrain::DeadZone(float input) { //Returns 0 if joystick inputs are within certain range
+	if (::fabs(input) <= 0.1)return 0; //Range is set to +- 10% of the center
+	return input;
+}
+
+void DriveTrain::ConfigureEncoder(Encoder * e)
+{
+	float feet_per_pulse = 12.5 / 12.0 / 250.0;		
+	e->Reset();
+	e->SetDistancePerPulse(feet_per_pulse);
+	e->Start();
+}
+
 void DriveTrain::logHeaders(ostream &f)
 {
 	/*
@@ -82,18 +96,4 @@ void DriveTrain::log(ostream &f)
 		f << sensors[i]->GetCurrent() << ",";
 	}
 	*/
-}
-
-
-float DriveTrain::DeadZone(float input) { //Returns 0 if joystick inputs are within certain range
-	if (::fabs(input) <= 0.1)return 0; //Range is set to +- 10% of the center
-	return input;
-}
-
-void DriveTrain::ConfigureEncoder(Encoder * e)
-{
-	float feet_per_pulse = 12.5 / 12.0 / 250.0;		
-	e->Reset();
-	e->SetDistancePerPulse(feet_per_pulse);
-	e->Start();
 }

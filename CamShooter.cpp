@@ -3,23 +3,20 @@
 
 using namespace std;
 
-CamShooter::CamShooter()
+CamShooter::CamShooter(int jag1)
 {
-	
+	ShooterJag = new CANJaguar(jag1,CANJaguar::kSpeed);
 }
-
 CamShooter::~CamShooter()
 {
 }
-
-
+void CamShooter::DisplayPosition()
+{
+	cout<<ShooterJag->GetPosition()<<endl;
+}
 void CamShooter::Shoot()
 {
 	
-}
-void CamShooter::ResetEncoder(Encoder * myCamEncoder)
-{
-	myCamEncoder->Reset();
 }
 void CamShooter::logHeaders(ostream &f)
 {
