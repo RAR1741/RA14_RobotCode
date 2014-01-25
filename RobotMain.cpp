@@ -50,7 +50,7 @@ void RA14Robot::RobotInit() {
 	cout << __DATE__ << " at " << __TIME__ << endl;
 	
 	myCompressor = new Compressor(11,1);
-	
+
 	myCam = new CamShooter(9);
 	
 	myDrive = new DriveTrain(1,2,3,4,1,2,3,4,1,2,3,4);
@@ -128,6 +128,20 @@ void RA14Robot::TeleopPeriodic()
 	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
 	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
 	
+	
+	if(DriverGamepad->GetA())
+	{
+		myCam->SetPosition(true);
+		cout<<"Forward"<<endl;
+	}
+	if(DriverGamepad->GetB())
+	{
+		myCam->SetPosition(false);
+		cout<<"Backwards"<<endl;
+	}
+
+	//cout<<"The position is "<<myCam->GetPosition()<<endl;
+	
 	if(DriverLeftBumper)
 	{
 		myDrive->ShiftUp();
@@ -141,7 +155,6 @@ void RA14Robot::TeleopPeriodic()
 	
 	myDrive->Debug(cout);
 	
-	myCam->DisplayPosition();
 }
 
 /**

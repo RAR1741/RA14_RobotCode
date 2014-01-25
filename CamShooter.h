@@ -14,8 +14,8 @@ public:
 	~CamShooter();
 	
 	//Functions
-	void DisplayPosition();
-	void Shoot();
+	double GetPosition();
+	void SetPosition(bool pos);
 	void logHeaders(ostream &f);
 	void log(std::ostream &f);
 	void Debug(std::ostream &f);

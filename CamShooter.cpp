@@ -5,18 +5,26 @@ using namespace std;
 
 CamShooter::CamShooter(int jag1)
 {
-	ShooterJag = new CANJaguar(jag1,CANJaguar::kSpeed);
+	ShooterJag = new CANJaguar(jag1);
+	
+	//ShooterJag->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+	//ShooterJag->SetPID(1,0,0);
+	//ShooterJag->ConfigEncoderCodesPerRev(100);
+	//ShooterJag->EnableControl(0);
 }
 CamShooter::~CamShooter()
 {
 }
-void CamShooter::DisplayPosition()
+double CamShooter::GetPosition()
 {
-	cout<<ShooterJag->GetPosition()<<endl;
+	return ShooterJag->GetPosition();
 }
-void CamShooter::Shoot()
+void CamShooter::SetPosition(bool pos)
 {
-	
+	if(pos == false)
+		ShooterJag->Set(.25);
+	else if(pos == true)
+		ShooterJag->Set(-.25);
 }
 void CamShooter::logHeaders(ostream &f)
 {
