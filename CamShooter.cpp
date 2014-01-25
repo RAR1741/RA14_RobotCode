@@ -1,12 +1,28 @@
 #include "CamShooter.h"
-
+#include "WPILib.h"
 
 using namespace std;
 
-CamShooter::CamShooter(int jag1)
+
+CamShooter::CamShooter(int motor, int encoderA, int encoderB, int indexInput)
 {
-	ShooterJag = new CANJaguar(jag1);
+	const float lines_per_rev = 100;
+	//ShooterJag = new CANJaguar(jag1,CANJaguar::kPercentVbus);
+	ShooterMotor = new Talon(motor);
+	ShooterEncoder = new Encoder(encoderA, encoderB, false, Encoder::k4X);
+	IndexSensor = new DigitalInput(indexInput);
 	
+	ShooterEncoder->SetDistancePerPulse(1);
+	ShooterEncoder->SetPIDSourceParameter(Encoder::kDistance);
+	ShooterEncoder->Reset();
+	ShooterEncoder->Start();
+	
+	IndexSeenLastSample = false;
+	
+	PID = new PIDController(0.04, 0.005, 0.03, ShooterEncoder, ShooterMotor);
+	PID->SetInputRange(0, lines_per_rev);
+	PID->SetOutputRange(-1, 1);
+	PID->Enable();
 	//ShooterJag->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
 	//ShooterJag->SetPID(1,0,0);
 	//ShooterJag->ConfigEncoderCodesPerRev(100);
@@ -17,14 +33,43 @@ CamShooter::~CamShooter()
 }
 double CamShooter::GetPosition()
 {
-	return ShooterJag->GetPosition();
+	return ShooterEncoder->Get();
 }
-void CamShooter::SetPosition(bool pos)
+
+/**
+ * @brief Peforms basic housekeeping logic outside of operator control.
+ */
+void CamShooter::Process()
 {
+	bool IndexSeen = (bool) IndexSensor->Get();
+	bool RisingEdge = false;
+	bool FallingEdge = false;
+	
+	if (IndexSeen && !IndexSeenLastSample) {
+		// Rising edge. We just saw the index pulse for the first time
+		RisingEdge = true;
+	} else if (!IndexSeen && IndexSeenLastSample) {
+		// Falling edge. We are no longer seeing the index pulse
+		FallingEdge = true;
+	}
+	
+	if (RisingEdge) {
+		// Reset position count to zero.
+		ShooterEncoder->Reset();
+		ShooterEncoder->Start();
+	}
+	
+	IndexSeenLastSample = IndexSeen; // Record for next iteration
+}
+void CamShooter::SetPosition(float pos)
+{
+	/*
 	if(pos == false)
 		ShooterJag->Set(.25);
 	else if(pos == true)
 		ShooterJag->Set(-.25);
+	*/
+	PID->SetSetpoint(pos);
 }
 void CamShooter::logHeaders(ostream &f)
 {
@@ -51,5 +96,12 @@ void CamShooter::log(ostream &f)
 		f << sensors[i]->GetCurrent() << ",";
 	}
 	*/
+}
+
+void CamShooter::Debug(ostream &out) 
+{
+	out << "Encoder: " << ShooterEncoder->GetDistance() << 
+	 "Motor: " << ShooterMotor->Get() << 
+	 "Sensor: " << (IndexSensor->Get() ? "SEEN" : "") << endl;
 }
 

@@ -10,17 +10,21 @@
 class CamShooter
 {
 public:
-	CamShooter(int jag1);
+	CamShooter(int motor, int encoderA, int encoderB, int indexInput);
 	~CamShooter();
 	
 	//Functions
+	void Process(); // Basic housekeeping tasks outside of operator control
 	double GetPosition();
-	void SetPosition(bool pos);
+	void SetPosition(float pos);
 	void logHeaders(ostream &f);
 	void log(std::ostream &f);
 	void Debug(std::ostream &f);
-		
 private:
-	CANJaguar * ShooterJag;
-	
+	Talon * ShooterMotor;
+	Encoder * ShooterEncoder;
+	DigitalInput * IndexSensor;
+	PIDController * PID;
+	bool IndexSeenLastSample;  // Was the index pulse seen during the last sample
+							
 };

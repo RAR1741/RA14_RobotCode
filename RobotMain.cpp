@@ -13,6 +13,7 @@ class RA14Robot : public IterativeRobot
 {
 private:
 	CamShooter * myCam;
+	CANJaguar * myJag;
 	DriveTrain * myDrive;
 	Gamepad * DriverGamepad;
 	Gamepad * OperatorGamepad;
@@ -49,12 +50,19 @@ void RA14Robot::RobotInit() {
 	cout << "Compiled on: ";
 	cout << __DATE__ << " at " << __TIME__ << endl;
 	
+	cout << "Initializing compressor..." << endl;
 	myCompressor = new Compressor(11,1);
-
-	myCam = new CamShooter(9);
+	cout << "Compressor initialized." << endl;
 	
-	myDrive = new DriveTrain(1,2,3,4,1,2,3,4,1,2,3,4);
+	cout << "Initializing cam shooter..." << endl;
+	myCam = new CamShooter(1, 1, 2, 3);
+	//myJag = new CANJaguar(14,CANJaguar::kPercentVbus);
+	cout << "Cam shooter initialized." << endl;
+	
+	cout << "Initializing drivetrain..." << endl;
+	//myDrive = new DriveTrain(1,2,3,4,1,2,3,4,1,2,3,4);
 	//myDrive = new DriveTrain(6,2,7,4,1,2,3,4 );
+	cout << "Drivetrain initialized." << endl;
 	
 	cout << "Initializing gamepads..." << endl;
 	DriverGamepad = new Gamepad(1);
@@ -128,20 +136,24 @@ void RA14Robot::TeleopPeriodic()
 	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
 	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
 	
+	myCam->Process();
 	
 	if(DriverGamepad->GetA())
 	{
-		myCam->SetPosition(true);
+		//myCam->SetPosition(true);
+		//myJag->Set(-0.25);
+		myCam->SetPosition(25);
 		cout<<"Forward"<<endl;
 	}
 	if(DriverGamepad->GetB())
 	{
-		myCam->SetPosition(false);
+		//myCam->SetPosition(false);
+		//myJag->Set(0.25);
+		myCam->SetPosition(50);
 		cout<<"Backwards"<<endl;
 	}
-
 	//cout<<"The position is "<<myCam->GetPosition()<<endl;
-	
+#if 0
 	if(DriverLeftBumper)
 	{
 		myDrive->ShiftUp();
@@ -150,11 +162,13 @@ void RA14Robot::TeleopPeriodic()
 	{
 		myDrive->ShiftDown();
 	}
+
 	
 	myDrive->Drive(DriverLeftY, DriverRightY);
 	
 	myDrive->Debug(cout);
-	
+#endif
+	myCam->Debug(cout);
 }
 
 /**
