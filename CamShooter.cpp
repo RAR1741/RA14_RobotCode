@@ -1,5 +1,6 @@
 #include "CamShooter.h"
 #include "WPILib.h"
+#include <iomanip>
 
 using namespace std;
 
@@ -22,6 +23,7 @@ CamShooter::CamShooter(int motor, int encoderA, int encoderB, int indexInput)
 	PID = new PIDController(0.04, 0.005, 0.03, ShooterEncoder, ShooterMotor);
 	PID->SetInputRange(0, lines_per_rev);
 	PID->SetOutputRange(-1, 1);
+	PID->SetContinuous(true);
 	PID->Enable();
 	//ShooterJag->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
 	//ShooterJag->SetPID(1,0,0);
@@ -41,7 +43,7 @@ double CamShooter::GetPosition()
  */
 void CamShooter::Process()
 {
-	bool IndexSeen = (bool) IndexSensor->Get();
+	bool IndexSeen = !!!IndexSensor->Get();
 	bool RisingEdge = false;
 	bool FallingEdge = false;
 	
@@ -57,6 +59,9 @@ void CamShooter::Process()
 		// Reset position count to zero.
 		ShooterEncoder->Reset();
 		ShooterEncoder->Start();
+		PID->SetSetpoint(90);
+		PID->Reset();
+		PID->Enable();
 	}
 	
 	IndexSeenLastSample = IndexSeen; // Record for next iteration
@@ -100,8 +105,8 @@ void CamShooter::log(ostream &f)
 
 void CamShooter::Debug(ostream &out) 
 {
-	out << "Encoder: " << ShooterEncoder->GetDistance() << 
-	 "Motor: " << ShooterMotor->Get() << 
-	 "Sensor: " << (IndexSensor->Get() ? "SEEN" : "") << endl;
+	out << "Encoder: " << fixed << setprecision(6) << ShooterEncoder->GetDistance() << 
+	 "  Motor: " << fixed << setprecision(6) << ShooterMotor->Get() << 
+	 "Sensor: " << (!!!IndexSensor->Get() ? "SEEN" : "") << endl;
 }
 

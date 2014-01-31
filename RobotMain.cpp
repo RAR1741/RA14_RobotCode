@@ -15,6 +15,7 @@ private:
 	CamShooter * myCam;
 	CANJaguar * myJag;
 	DriveTrain * myDrive;
+	Relay * myCamera;
 	Gamepad * DriverGamepad;
 	Gamepad * OperatorGamepad;
 	Compressor * myCompressor;
@@ -22,6 +23,12 @@ private:
 	float DriverRightY;
 	bool DriverLeftBumper;
 	bool DriverRightBumper;
+	
+	DigitalOutput * CurrentSensorReset;
+	
+	bool ResetSetting;
+	
+	bool recentlyPressed;
 	
 public:
   RA14Robot()
@@ -31,10 +38,14 @@ public:
 	DriverGamepad = NULL;
 	OperatorGamepad = NULL;	
 	myCompressor = NULL;
+	myCamera = NULL;
 	DriverLeftY = 0.0;
 	DriverRightY = 0.0;  
 	DriverLeftBumper = true;
 	DriverRightBumper = true;
+	CurrentSensorReset = NULL;
+	ResetSetting = false;
+	recentlyPressed = false;
   }
   
 /**
@@ -69,9 +80,33 @@ void RA14Robot::RobotInit() {
 	OperatorGamepad = new Gamepad(2);
 	cout << "Gamepads initialized." << endl;
 	
+	cout << "Initializing CurrentSensor..." << endl;
+	
+	CurrentSensorReset = new DigitalOutput(5);
+	myCamera = new Relay(2);
+	
+	cout << "CurrentSensor initialized." << endl;
+	
+	cout << "Set period to 10Hz" << endl;
+	this->SetPeriod(0.10);
+	cout << "Period set to " << this->GetLoopsPerSec() << "Hz" << endl;
+	
 	cout << "Robot Init Complete..." << endl;
 	
 	
+}
+
+void RA14Robot::StartOfCycleMaintenance()
+{
+	//CurrentSensorReset->Set(0);
+	
+}
+
+void RA14Robot::EndOfCycleMaintenance()
+{
+	//CurrentSensorReset->Set(1);
+	ResetSetting = ! ResetSetting;
+	CurrentSensorReset->Set(ResetSetting);
 }
 
 /**
@@ -92,6 +127,9 @@ void RA14Robot::DisabledInit() {
  * rate while the robot is in disabled mode.
  */
 void RA14Robot::DisabledPeriodic() {
+	StartOfCycleMaintenance();
+	
+	EndOfCycleMaintenance();
 }
 
 /**
@@ -110,6 +148,9 @@ void RA14Robot::AutonomousInit() {
  * rate while the robot is in autonomous mode.
  */
 void RA14Robot::AutonomousPeriodic() {
+	StartOfCycleMaintenance();
+	
+	EndOfCycleMaintenance();
 }
 
 /**
@@ -131,6 +172,7 @@ void RA14Robot::TeleopInit() {
 void RA14Robot::TeleopPeriodic() 
 {
 	
+	StartOfCycleMaintenance();
 	DriverLeftY = DriverGamepad->GetLeftY();
 	DriverRightY = DriverGamepad->GetRightY();
 	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
@@ -142,15 +184,30 @@ void RA14Robot::TeleopPeriodic()
 	{
 		//myCam->SetPosition(true);
 		//myJag->Set(-0.25);
-		myCam->SetPosition(25);
+		myCam->SetPosition(90);
 		cout<<"Forward"<<endl;
 	}
 	if(DriverGamepad->GetB())
 	{
 		//myCam->SetPosition(false);
 		//myJag->Set(0.25);
-		myCam->SetPosition(50);
+		myCam->SetPosition(110);
 		cout<<"Backwards"<<endl;
+	}
+	
+	if(DriverGamepad->GetY())
+	{
+		recentlyPressed = true;
+	}
+	
+	if(!DriverGamepad->GetY() && recentlyPressed)
+	{
+		if(myCamera->Get() == Relay::kOff)
+			myCamera->Set(Relay::kForward);
+		else
+			myCamera->Set(Relay::kOff);
+		
+		recentlyPressed = false;
 	}
 	//cout<<"The position is "<<myCam->GetPosition()<<endl;
 #if 0
@@ -169,6 +226,8 @@ void RA14Robot::TeleopPeriodic()
 	myDrive->Debug(cout);
 #endif
 	myCam->Debug(cout);
+	
+	EndOfCycleMaintenance();
 }
 
 /**
@@ -186,8 +245,14 @@ void RA14Robot::TestInit() {
  * Use this method for code which will be called periodically at a regular
  * rate while the robot is in test mode.
  */
-void RA14Robot::TestPeriodic() {
+void RA14Robot::TestPeriodic()
+{
+	StartOfCycleMaintenance();
+	
+	EndOfCycleMaintenance();
 }
+
+
 
 };
 
