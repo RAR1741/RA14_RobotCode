@@ -73,11 +73,14 @@ void CamShooter::Process(bool fire)
 	bool FireButton = fire;
 	float setpoint = PID->GetSetpoint();
 	
+	
 	switch (m_state) {
 	case CamShooter::Rearming:
 		if (IndexSeen && !IndexSeenLastSample) {
 					ShooterEncoder->Reset();
 					CamProfile->Reset();
+		} else {
+			CamProfile->Start();
 		}
 			
 		if (ShooterEncoder->GetDistance() >= 60 
@@ -100,19 +103,18 @@ void CamShooter::Process(bool fire)
 	case CamShooter::ReadyToFire:
 		setpoint = 50;
 		
-		if (fire) {
+		if (FireButton) {
 			CamProfile->Start();
 			m_state = CamShooter::Firing;
 		}
 		break;
 	case CamShooter::Firing:
-		break;
 		setpoint = 60;
 		
 		if (ShooterEncoder->GetDistance() >= 60) {
 			m_state = CamShooter::Rearming;
 		}
-	
+		break;
 	default:
 		// ERROR
 		break;
@@ -161,9 +163,11 @@ void CamShooter::log(ostream &f)
 void CamShooter::Debug(ostream &out) 
 {
 	out << "Encoder: " << fixed << setprecision(2) << ShooterEncoder->GetDistance()
-		<< "  Motor: " << fixed << setprecision(2) << ShooterMotor->Get() 
+		<< " Setpoint: " << fixed << setprecision(2) << PID->GetSetpoint() 
+		<< " Motor: " << fixed << setprecision(2) << ShooterMotor->Get() 
 		<< " Sensor: " << (!!!IndexSensor->Get() ? "SEEN" : "")
-		<< CamShooter::StateNumberToString(m_state) << endl;
+		
+		<< " State: " << CamShooter::StateNumberToString(m_state) << endl;
 }
 
 
