@@ -39,6 +39,16 @@ CamShooter::~CamShooter()
 {
 }
 
+void CamShooter::Reset()  {
+	PID->Disable();
+	PID->SetPID(
+			Config::GetSetting("cam_p", 0.04),
+			Config::GetSetting("cam_i", 0.005),
+			Config::GetSetting("cam_d", 0.03)
+			);
+	PID->Enable();
+}
+
 void CamShooter::InitializeProfile()
 {
 	CamProfile->LoadFromFile("camprofile.txt");

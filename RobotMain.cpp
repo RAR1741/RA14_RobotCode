@@ -128,6 +128,7 @@ void RA14Robot::DisabledInit() {
 	if (alreadyInitialized) {
 		Config::Dump();
 	}
+	myCam->Reset();
 	
 	
 }

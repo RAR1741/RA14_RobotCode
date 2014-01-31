@@ -21,6 +21,8 @@ public:
 	void logHeaders(ostream &f);
 	void log(std::ostream &f);
 	void Debug(std::ostream &f);
+	
+	void Reset();
 private:
 	bool IndexTripped() { return !!!IndexSensor->Get(); } 
 	void InitializeProfile();
