@@ -25,46 +25,101 @@ CamShooter::CamShooter(int motor, int encoderA, int encoderB, int indexInput)
 	PID->SetOutputRange(-1, 1);
 	PID->SetContinuous(true);
 	PID->Enable();
-	//ShooterJag->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
-	//ShooterJag->SetPID(1,0,0);
-	//ShooterJag->ConfigEncoderCodesPerRev(100);
-	//ShooterJag->EnableControl(0);
+	
+	m_state = CamShooter::Rearming;
+	
+	CamProfile = new MotionProfile(0, 100);
+	
+	InitializeProfile();
 }
 CamShooter::~CamShooter()
 {
+}
+
+void CamShooter::InitializeProfile()
+{
+	CamProfile->LoadFromFile("camprofile.txt");
 }
 double CamShooter::GetPosition()
 {
 	return ShooterEncoder->Get();
 }
 
+const char * CamShooter::StateNumberToString(int state)
+{
+	switch (state) {
+	case CamShooter::Rearming:
+		return "Rearming";
+		break;
+	case CamShooter::Firing:
+		return "Firing";
+		break;
+	case CamShooter::ReadyToFire:
+		return "ReadyToFire";
+		break;
+	default:
+		// ERROR
+		return "Unknown";
+		break;
+	}
+}
+
 /**
  * @brief Peforms basic housekeeping logic outside of operator control.
  */
-void CamShooter::Process()
+void CamShooter::Process(bool fire)
 {
-	bool IndexSeen = !!!IndexSensor->Get();
-	bool RisingEdge = false;
-	bool FallingEdge = false;
+	bool IndexSeen = IndexTripped();
+	bool FireButton = fire;
+	float setpoint = PID->GetSetpoint();
 	
-	if (IndexSeen && !IndexSeenLastSample) {
-		// Rising edge. We just saw the index pulse for the first time
-		RisingEdge = true;
-	} else if (!IndexSeen && IndexSeenLastSample) {
-		// Falling edge. We are no longer seeing the index pulse
-		FallingEdge = true;
+	switch (m_state) {
+	case CamShooter::Rearming:
+		if (IndexSeen && !IndexSeenLastSample) {
+					ShooterEncoder->Reset();
+					CamProfile->Reset();
+		}
+			
+		if (ShooterEncoder->GetDistance() >= 60 
+				&& ShooterEncoder->GetDistance() <= 110) {
+			// At starting point
+			// Climb towards zero
+			setpoint = CamProfile->GetValue();
+		} else if (ShooterEncoder->GetDistance() < 50) {
+			setpoint = CamProfile->GetValue();
+		}
+		
+		setpoint = CamProfile->GetValue();
+		
+		if (ShooterEncoder->GetDistance() >= 50.0) {
+			m_state = CamShooter::ReadyToFire;
+			CamProfile->Stop();
+		}
+		
+		break;
+	case CamShooter::ReadyToFire:
+		setpoint = 50;
+		
+		if (fire) {
+			CamProfile->Start();
+			m_state = CamShooter::Firing;
+		}
+		break;
+	case CamShooter::Firing:
+		break;
+		setpoint = 60;
+		
+		if (ShooterEncoder->GetDistance() >= 60) {
+			m_state = CamShooter::Rearming;
+		}
+	
+	default:
+		// ERROR
+		break;
 	}
 	
-	if (RisingEdge) {
-		// Reset position count to zero.
-		ShooterEncoder->Reset();
-		ShooterEncoder->Start();
-		PID->SetSetpoint(90);
-		PID->Reset();
-		PID->Enable();
-	}
-	
-	IndexSeenLastSample = IndexSeen; // Record for next iteration
+	PID->SetSetpoint(setpoint);
+	IndexSeenLastSample = IndexSeen;
 }
 void CamShooter::SetPosition(float pos)
 {
@@ -105,8 +160,11 @@ void CamShooter::log(ostream &f)
 
 void CamShooter::Debug(ostream &out) 
 {
-	out << "Encoder: " << fixed << setprecision(6) << ShooterEncoder->GetDistance() << 
-	 "  Motor: " << fixed << setprecision(6) << ShooterMotor->Get() << 
-	 "Sensor: " << (!!!IndexSensor->Get() ? "SEEN" : "") << endl;
+	out << "Encoder: " << fixed << setprecision(2) << ShooterEncoder->GetDistance()
+		<< "  Motor: " << fixed << setprecision(2) << ShooterMotor->Get() 
+		<< " Sensor: " << (!!!IndexSensor->Get() ? "SEEN" : "")
+		<< CamShooter::StateNumberToString(m_state) << endl;
 }
+
+
 

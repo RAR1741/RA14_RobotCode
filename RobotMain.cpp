@@ -178,7 +178,9 @@ void RA14Robot::TeleopPeriodic()
 	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
 	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
 	
-	myCam->Process();
+	bool ShouldFire = DriverGamepad->GetRightTrigger();
+	
+	myCam->Process(ShouldFire);
 	
 	if(DriverGamepad->GetA())
 	{
