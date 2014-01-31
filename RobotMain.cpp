@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include "Gamepad.h"
+#include "Config.h"
 
 using namespace std;
 
@@ -29,6 +30,7 @@ private:
 	bool ResetSetting;
 	
 	bool recentlyPressed;
+	bool alreadyInitialized;
 	
 public:
   RA14Robot()
@@ -46,6 +48,7 @@ public:
 	CurrentSensorReset = NULL;
 	ResetSetting = false;
 	recentlyPressed = false;
+	alreadyInitialized = false;
   }
   
 /**
@@ -61,6 +64,9 @@ void RA14Robot::RobotInit() {
 	cout << "Compiled on: ";
 	cout << __DATE__ << " at " << __TIME__ << endl;
 	
+	cout << "Initializing configuration..." << endl;
+	Config::LoadFromFile("config.txt");
+	cout << "Configuration read." << endl;
 	cout << "Initializing compressor..." << endl;
 	myCompressor = new Compressor(11,1);
 	cout << "Compressor initialized." << endl;
@@ -87,8 +93,8 @@ void RA14Robot::RobotInit() {
 	
 	cout << "CurrentSensor initialized." << endl;
 	
-	cout << "Set period to 10Hz" << endl;
-	this->SetPeriod(0.10);
+	//cout << "Set period to 10Hz" << endl;
+	this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
 	cout << "Period set to " << this->GetLoopsPerSec() << "Hz" << endl;
 	
 	cout << "Robot Init Complete..." << endl;
@@ -118,6 +124,12 @@ void RA14Robot::EndOfCycleMaintenance()
 void RA14Robot::DisabledInit() {
 	myCompressor->Stop();
 	
+	Config::LoadFromFile("config.txt");
+	if (alreadyInitialized) {
+		Config::Dump();
+	}
+	
+	
 }
 
 /**
@@ -139,6 +151,7 @@ void RA14Robot::DisabledPeriodic() {
  * the robot enters autonomous mode.
  */
 void RA14Robot::AutonomousInit() {
+	alreadyInitialized = true;
 }
 
 /**
@@ -161,6 +174,7 @@ void RA14Robot::AutonomousPeriodic() {
  */
 void RA14Robot::TeleopInit() {
 	myCompressor->Start();
+	alreadyInitialized = true;
 }
 
 /**

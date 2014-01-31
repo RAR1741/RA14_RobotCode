@@ -35,6 +35,7 @@ private:
 		ReadyToFire = 1,		// Low-energy state where we can fire quickly
 		Firing      = 2,        // Releasing cam
 		Rearming    = 3,        // Rearming
+		ExitFiring  = 4,
 	} CamShooterState;
 	int m_state;
 	

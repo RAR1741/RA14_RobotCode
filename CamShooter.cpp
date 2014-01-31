@@ -1,4 +1,5 @@
 #include "CamShooter.h"
+#include "Config.h"
 #include "WPILib.h"
 #include <iomanip>
 
@@ -75,30 +76,21 @@ void CamShooter::Process(bool fire)
 	bool FireButton = fire;
 	float setpoint = PID->GetSetpoint();
 	
+	float cycle_period = Config::GetSetting("robot_loop_period", 0.05);
+	float rate = Config::GetSetting("robot_cam_rearm_rate", 30);
 	
+	float lines_forward = cycle_period * rate;
 	switch (m_state) {
 	case CamShooter::Rearming:
 		if (IndexSeen && !IndexSeenLastSample) {
 					ShooterEncoder->Reset();
-					CamProfile->Reset();
-		} else {
-			CamProfile->Start();
-		}
-			
-		if (ShooterEncoder->GetDistance() >= 60 
-				&& ShooterEncoder->GetDistance() <= 110) {
-			// At starting point
-			// Climb towards zero
-			setpoint = CamProfile->GetValue();
-		} else if (ShooterEncoder->GetDistance() < 50) {
-			setpoint = CamProfile->GetValue();
+					setpoint = 0 + lines_forward;
 		}
 		
-		setpoint = CamProfile->GetValue();
+		setpoint += lines_forward;
 		
 		if (ShooterEncoder->GetDistance() >= 50.0) {
 			m_state = CamShooter::ReadyToFire;
-			CamProfile->Stop();
 		}
 		
 		break;
@@ -106,7 +98,6 @@ void CamShooter::Process(bool fire)
 		setpoint = 50;
 		
 		if (!FireButtonLast && FireButton) {
-			CamProfile->Start();
 			m_state = CamShooter::Firing;
 		}
 		break;
@@ -114,8 +105,17 @@ void CamShooter::Process(bool fire)
 		setpoint = 60;
 		
 		if (ShooterEncoder->GetDistance() >= 60) {
+			m_state = CamShooter::ExitFiring;
+		}
+		break;
+	case CamShooter::ExitFiring:
+		if (IndexSeen && !IndexSeenLastSample) {
+			ShooterEncoder->Reset();
+			setpoint = 0 + lines_forward;
 			m_state = CamShooter::Rearming;
 		}
+				
+		setpoint += lines_forward;
 		break;
 	default:
 		// ERROR
