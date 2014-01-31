@@ -30,6 +30,8 @@ CamShooter::CamShooter(int motor, int encoderA, int encoderB, int indexInput)
 	
 	CamProfile = new MotionProfile(0, 100);
 	
+	FireButtonLast = false;
+	
 	InitializeProfile();
 }
 CamShooter::~CamShooter()
@@ -103,7 +105,7 @@ void CamShooter::Process(bool fire)
 	case CamShooter::ReadyToFire:
 		setpoint = 50;
 		
-		if (FireButton) {
+		if (!FireButtonLast && FireButton) {
 			CamProfile->Start();
 			m_state = CamShooter::Firing;
 		}
@@ -122,6 +124,7 @@ void CamShooter::Process(bool fire)
 	
 	PID->SetSetpoint(setpoint);
 	IndexSeenLastSample = IndexSeen;
+	FireButtonLast = FireButton;
 }
 void CamShooter::SetPosition(float pos)
 {

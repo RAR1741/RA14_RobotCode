@@ -38,6 +38,7 @@ private:
 	} CamShooterState;
 	int m_state;
 	
+	bool FireButtonLast;
 	static const char * StateNumberToString(int state);
 							
 };
