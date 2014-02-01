@@ -162,6 +162,7 @@ void RA14Robot::AutonomousInit() {
 		fout.open("logging.csv");
 		logheaders();
 	}
+	myCam->PIDEnable();
 }
 
 /**
@@ -189,6 +190,7 @@ void RA14Robot::TeleopInit() {
 		fout.open("logging.csv");
 		logheaders();
 	}
+	myCam->PIDEnable();
 }
 
 /**

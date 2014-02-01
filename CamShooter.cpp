@@ -2,9 +2,11 @@
 #include "Config.h"
 #include "WPILib.h"
 #include <iomanip>
+#include <cmath>
 
-using namespace std;
-
+#define CAM_READY_TO_FIRE_POSITION ( Config::GetSetting("cam_ready_to_fire_position", 35) )
+#define CAM_FIRE_TO_POSITION ( Config::GetSetting("cam_fire_to_position", 45) )
+#define CAM_FIRE_POSITION_TOLERANCE ( Config::GetSetting("cam_fire_position_tolerance",3) )
 
 CamShooter::CamShooter(int motor, int encoderA, int encoderB, int indexInput)
 {
@@ -31,10 +33,11 @@ CamShooter::CamShooter(int motor, int encoderA, int encoderB, int indexInput)
 	PID->SetContinuous(true);
 	PID->Enable();
 	
-	m_state = CamShooter::Rearming;
+	m_state = CamShooter::Calibration;
 	
 	//CamProfile = new MotionProfile(0, 100);
 	
+	IndexHasBeenReset = false;
 	FireButtonLast = false;
 	
 	InitializeProfile();
@@ -51,6 +54,9 @@ void CamShooter::Reset()  {
 			Config::GetSetting("cam_i", 0.005),
 			Config::GetSetting("cam_d", 0.03)
 			);
+	
+}
+void CamShooter::PIDEnable() {
 	PID->Enable();
 }
 
@@ -75,8 +81,8 @@ const char * CamShooter::StateNumberToString(int state)
 	case CamShooter::ReadyToFire:
 		return "ReadyToFire";
 		break;
-	case CamShooter::ExitFiring:
-		return "ExitFiring";
+	case CamShooter::Calibration:
+		return "Calibration";
 		break;
 	default:
 		// ERROR
@@ -98,48 +104,45 @@ void CamShooter::Process(bool fire)
 	float rate = Config::GetSetting("robot_cam_rearm_rate", 30);
 	
 	float lines_forward = cycle_period * rate;
+	if ((IndexSeen && !IndexSeenLastSample) || setpoint>=100) {
+		ShooterEncoder->Reset();
+		setpoint = 0 + lines_forward;
+		IndexHasBeenReset = true;
+	}
+	else {
+		IndexHasBeenReset = false;
+	}
+	
 	switch (m_state) {
 	case CamShooter::Rearming:
-		if (IndexSeen && !IndexSeenLastSample) {
-			ShooterEncoder->Reset();
-			setpoint = 0 + lines_forward;
-		}
-		
 		setpoint += lines_forward;
-		
-		/*
-		if (ShooterEncoder->GetDistance() >= 50.0) {
-			m_state = CamShooter::ReadyToFire;
-		}
-		*/
-		if (setpoint >= 50.0) {
+
+		if (::fabs(CAM_READY_TO_FIRE_POSITION - setpoint) < CAM_FIRE_POSITION_TOLERANCE) {
 			m_state = CamShooter::ReadyToFire;
 		}
 		
 		break;
 	case CamShooter::ReadyToFire:
-		setpoint = 50;
+		setpoint = CAM_READY_TO_FIRE_POSITION;
 		
 		if (!FireButtonLast && FireButton) {
 			m_state = CamShooter::Firing;
 		}
 		break;
 	case CamShooter::Firing:
-		setpoint = 60;
+		setpoint = CAM_FIRE_TO_POSITION;
 		
-		if (ShooterEncoder->GetDistance() >= 60) {
-			m_state = CamShooter::ExitFiring;
-		}
-		break;
-	case CamShooter::ExitFiring:
-		if (IndexSeen && !IndexSeenLastSample) {
-			ShooterEncoder->Reset();
-			setpoint = 0 + lines_forward;
+		if (ShooterEncoder->GetDistance() >= (CAM_FIRE_TO_POSITION - 1)) {
 			m_state = CamShooter::Rearming;
 		}
-				
-		setpoint += lines_forward;
 		break;
+	case CamShooter::Calibration:
+		setpoint += lines_forward;
+		if(IndexHasBeenReset){
+			m_state = CamShooter::Rearming;
+		}
+		break;
+		
 	default:
 		// ERROR
 		break;

@@ -1,9 +1,7 @@
 # config.txt
 # CAM PID
 cam_p = 0.017
-#cam_i = 0.002
-cam_i = 0.0001
-#cam_d = 0.0001
+cam_i = 0.0002
 cam_d = 0.00
 
 # Robot Loop period
@@ -11,3 +9,6 @@ robot_loop_period = .05
 
 # CAM
 robot_cam_rearm_rate = 60
+cam_ready_to_fire_position = 35
+cam_fire_to_position = 45
+cam_fire_position_tolerance = 3

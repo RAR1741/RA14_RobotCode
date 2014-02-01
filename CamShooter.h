@@ -15,6 +15,7 @@ public:
 	~CamShooter();
 	
 	//Functions
+	void PIDEnable(void);
 	void Process(bool fire);
 	double GetPosition();
 	void SetPosition(float pos);
@@ -37,10 +38,11 @@ private:
 		ReadyToFire = 1,		// Low-energy state where we can fire quickly
 		Firing      = 2,        // Releasing cam
 		Rearming    = 3,        // Rearming
-		ExitFiring  = 4,
+		Calibration  = 4,
 	} CamShooterState;
 	int m_state;
 	
+	bool IndexHasBeenReset;
 	bool FireButtonLast;
 	static const char * StateNumberToString(int state);
 							
