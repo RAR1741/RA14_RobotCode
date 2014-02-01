@@ -34,7 +34,7 @@ void CurrentSensor::Toggle(int toggleInput)
 	else
 	{
 		dig->Set(1); //Reseting the peak detector
-		cout<<"Average: "<<total*.1<<" ( "<<DCOffset<<" )"<<endl;
+		//cout<<"Average: "<<total*.1<<" ( "<<DCOffset<<" )"<<endl;
 		total = 0;
 		count = 0;
 		dig->Set(0); //Release peak detector from reset

@@ -104,7 +104,7 @@ void CamShooter::Process(bool fire)
 	float rate = Config::GetSetting("robot_cam_rearm_rate", 30);
 	
 	float lines_forward = cycle_period * rate;
-	if ((IndexSeen && !IndexSeenLastSample) || setpoint>=100) {
+	if (IndexSeen && !IndexSeenLastSample) {
 		ShooterEncoder->Reset();
 		setpoint = 0 + lines_forward;
 		IndexHasBeenReset = true;

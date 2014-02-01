@@ -144,6 +144,7 @@ void RA14Robot::DisabledInit() {
 	myCam->Reset();
 	
 	if(fout.is_open()) {
+		cout << "Closing logging.csv..." << endl;
 		fout.close();
 	}
 }
@@ -169,6 +170,7 @@ void RA14Robot::DisabledPeriodic() {
 void RA14Robot::AutonomousInit() {
 	alreadyInitialized = true;
 	if(!fout.is_open()) {
+		cout << "Opening logging.csv..." << endl;
 		fout.open("logging.csv");
 		logheaders();
 	}
@@ -197,6 +199,7 @@ void RA14Robot::TeleopInit() {
 	myCompressor->Start();
 	alreadyInitialized = true;
 	if(!fout.is_open()) {
+		cout << "Opening logging.csv..." << endl;
 		fout.open("logging.csv");
 		logheaders();
 	}
@@ -278,7 +281,7 @@ void RA14Robot::TeleopPeriodic()
 	
 	myDrive->Debug(cout);
 #endif
-	//myCam->Debug(cout);
+	myCam->Debug(cout);
 	
 	EndOfCycleMaintenance();
 	logging();
