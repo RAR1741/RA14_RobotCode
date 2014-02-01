@@ -7,16 +7,19 @@
 #include <fstream>
 #include "Gamepad.h"
 #include "Config.h"
+#include "CurrentSensor.h"
 
 using namespace std;
 
 class RA14Robot : public IterativeRobot
 {
 private:
+	Talon * testTalon;
 	ofstream fout;
 	CamShooter * myCam;
 	CANJaguar * myJag;
 	DriveTrain * myDrive;
+	CurrentSensor * mySensor;
 	Relay * myCamera;
 	Gamepad * DriverGamepad;
 	Gamepad * OperatorGamepad;
@@ -36,6 +39,8 @@ private:
 public:
   RA14Robot()
   {
+	testTalon = NULL;
+	mySensor = NULL;
 	myCam = NULL;
 	myDrive = NULL;  
 	DriverGamepad = NULL;
@@ -59,6 +64,7 @@ public:
  * be called when the robot is first powered on.  It will be called exactly 1 time.
  */
 void RA14Robot::RobotInit() {
+	testTalon = new Talon(7);
 
 	cout << "Initializing SmartDashboard..." << endl;
 	SmartDashboard::init();	
@@ -82,6 +88,10 @@ void RA14Robot::RobotInit() {
 	//myDrive = new DriveTrain(6,2,7,4,1,2,3,4 );
 	cout << "Drivetrain initialized." << endl;
 	
+	cout<<"Initializing current sensor.."<<endl;
+	mySensor = new CurrentSensor(7);
+	cout<<"Current sensor initialized."<<endl;
+	
 	cout << "Initializing gamepads..." << endl;
 	DriverGamepad = new Gamepad(1);
 	OperatorGamepad = new Gamepad(2);
@@ -92,7 +102,7 @@ void RA14Robot::RobotInit() {
 	myCamera = new Relay(2);
 	cout << "CurrentSensor initialized." << endl;
 	
-	//cout << "Set period to 10Hz" << endl;
+	//cout << "Set period to 20Hz" << endl;
 	this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
 	cout << "Period set to " << this->GetLoopsPerSec() << "Hz" << endl;
 	
@@ -201,12 +211,25 @@ void RA14Robot::TeleopInit() {
  */
 void RA14Robot::TeleopPeriodic() 
 {
-	
+	mySensor->Toggle(DriverGamepad->GetStart());
 	StartOfCycleMaintenance();
 	DriverLeftY = DriverGamepad->GetLeftY();
 	DriverRightY = DriverGamepad->GetRightY();
 	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
 	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
+	if (DriverGamepad->GetDPad()== Gamepad::kUp)
+	{
+		testTalon->Set(-.5);
+	}
+	else if (DriverGamepad->GetDPad()== Gamepad::kDown)
+	{
+		testTalon->Set(.5);
+	}
+	else
+	{
+		testTalon->Set(0);
+		mySensor->Calibrate();
+	}
 	
 	bool ShouldFire = DriverGamepad->GetRightTrigger();
 	
@@ -217,14 +240,12 @@ void RA14Robot::TeleopPeriodic()
 		//myCam->SetPosition(true);
 		//myJag->Set(-0.25);
 		myCam->SetPosition(90);
-		cout<<"Forward"<<endl;
 	}
 	if(DriverGamepad->GetB())
 	{
 		//myCam->SetPosition(false);
 		//myJag->Set(0.25);
 		myCam->SetPosition(110);
-		cout<<"Backwards"<<endl;
 	}
 	
 	if(DriverGamepad->GetY())
@@ -257,7 +278,7 @@ void RA14Robot::TeleopPeriodic()
 	
 	myDrive->Debug(cout);
 #endif
-	myCam->Debug(cout);
+	//myCam->Debug(cout);
 	
 	EndOfCycleMaintenance();
 	logging();
