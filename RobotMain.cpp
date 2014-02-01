@@ -13,6 +13,7 @@ using namespace std;
 class RA14Robot : public IterativeRobot
 {
 private:
+	ofstream fout;
 	CamShooter * myCam;
 	CANJaguar * myJag;
 	DriveTrain * myDrive;
@@ -58,15 +59,15 @@ public:
  * be called when the robot is first powered on.  It will be called exactly 1 time.
  */
 void RA14Robot::RobotInit() {
-	
-	SmartDashboard::init();
-	cout << "2014 Red Alert Robot" << endl;
-	cout << "Compiled on: ";
-	cout << __DATE__ << " at " << __TIME__ << endl;
+
+	cout << "Initializing SmartDashboard..." << endl;
+	SmartDashboard::init();	
+	cout << "SmartDachboard Initialized" << endl;
 	
 	cout << "Initializing configuration..." << endl;
 	Config::LoadFromFile("config.txt");
 	cout << "Configuration read." << endl;
+	
 	cout << "Initializing compressor..." << endl;
 	myCompressor = new Compressor(11,1);
 	cout << "Compressor initialized." << endl;
@@ -87,16 +88,17 @@ void RA14Robot::RobotInit() {
 	cout << "Gamepads initialized." << endl;
 	
 	cout << "Initializing CurrentSensor..." << endl;
-	
 	CurrentSensorReset = new DigitalOutput(5);
 	myCamera = new Relay(2);
-	
 	cout << "CurrentSensor initialized." << endl;
 	
 	//cout << "Set period to 10Hz" << endl;
 	this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
 	cout << "Period set to " << this->GetLoopsPerSec() << "Hz" << endl;
 	
+	cout << "2014 Red Alert Robot" << endl;
+	cout << "Compiled on: ";
+	cout << __DATE__ << " at " << __TIME__ << endl;
 	cout << "Robot Init Complete..." << endl;
 	
 	
@@ -128,9 +130,12 @@ void RA14Robot::DisabledInit() {
 	if (alreadyInitialized) {
 		Config::Dump();
 	}
+	
 	myCam->Reset();
 	
-	
+	if(fout.is_open()) {
+		fout.close();
+	}
 }
 
 /**
@@ -153,6 +158,10 @@ void RA14Robot::DisabledPeriodic() {
  */
 void RA14Robot::AutonomousInit() {
 	alreadyInitialized = true;
+	if(!fout.is_open()) {
+		fout.open("logging.csv");
+		logheaders();
+	}
 }
 
 /**
@@ -176,6 +185,10 @@ void RA14Robot::AutonomousPeriodic() {
 void RA14Robot::TeleopInit() {
 	myCompressor->Start();
 	alreadyInitialized = true;
+	if(!fout.is_open()) {
+		fout.open("logging.csv");
+		logheaders();
+	}
 }
 
 /**
@@ -245,6 +258,7 @@ void RA14Robot::TeleopPeriodic()
 	myCam->Debug(cout);
 	
 	EndOfCycleMaintenance();
+	logging();
 }
 
 /**
@@ -267,6 +281,18 @@ void RA14Robot::TestPeriodic()
 	StartOfCycleMaintenance();
 	
 	EndOfCycleMaintenance();
+}
+
+void RA14Robot::logheaders()
+{
+	myCam->logHeaders(fout);
+	fout << endl;
+}
+
+void RA14Robot::logging()
+{
+	myCam->log(fout);
+	fout << endl;
 }
 
 

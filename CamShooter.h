@@ -1,8 +1,8 @@
 #include "WPIlib.h"
 //#include "Config.h"
-#include "MotionProfile.h"
+//#include "MotionProfile.h"
 #include <fstream>
-#include <cmath>
+//#include <cmath>
 #include <cstdio>
 #include <iomanip>
 #include <iostream>
@@ -31,7 +31,7 @@ private:
 	DigitalInput * IndexSensor;
 	PIDController * PID;
 	bool IndexSeenLastSample;  // Was the index pulse seen during the last sample
-	MotionProfile * CamProfile;
+	//MotionProfile * CamProfile;
 	
 	typedef enum {
 		ReadyToFire = 1,		// Low-energy state where we can fire quickly

@@ -21,7 +21,11 @@ CamShooter::CamShooter(int motor, int encoderA, int encoderB, int indexInput)
 	
 	IndexSeenLastSample = false;
 	
-	PID = new PIDController(0.04, 0.005, 0.03, ShooterEncoder, ShooterMotor);
+	PID = new PIDController(Config::GetSetting("cam_p", 0.04),
+							Config::GetSetting("cam_i", 0.005), 
+							Config::GetSetting("cam_d", 0.03), 
+							ShooterEncoder, 
+							ShooterMotor);
 	PID->SetInputRange(0, lines_per_rev);
 	PID->SetOutputRange(-1, 1);
 	PID->SetContinuous(true);
@@ -29,7 +33,7 @@ CamShooter::CamShooter(int motor, int encoderA, int encoderB, int indexInput)
 	
 	m_state = CamShooter::Rearming;
 	
-	CamProfile = new MotionProfile(0, 100);
+	//CamProfile = new MotionProfile(0, 100);
 	
 	FireButtonLast = false;
 	
@@ -40,6 +44,7 @@ CamShooter::~CamShooter()
 }
 
 void CamShooter::Reset()  {
+	PID->Reset();
 	PID->Disable();
 	PID->SetPID(
 			Config::GetSetting("cam_p", 0.04),
@@ -51,7 +56,7 @@ void CamShooter::Reset()  {
 
 void CamShooter::InitializeProfile()
 {
-	CamProfile->LoadFromFile("camprofile.txt");
+	//CamProfile->LoadFromFile("camprofile.txt");
 }
 double CamShooter::GetPosition()
 {
@@ -69,6 +74,9 @@ const char * CamShooter::StateNumberToString(int state)
 		break;
 	case CamShooter::ReadyToFire:
 		return "ReadyToFire";
+		break;
+	case CamShooter::ExitFiring:
+		return "ExitFiring";
 		break;
 	default:
 		// ERROR
@@ -93,13 +101,18 @@ void CamShooter::Process(bool fire)
 	switch (m_state) {
 	case CamShooter::Rearming:
 		if (IndexSeen && !IndexSeenLastSample) {
-					ShooterEncoder->Reset();
-					setpoint = 0 + lines_forward;
+			ShooterEncoder->Reset();
+			setpoint = 0 + lines_forward;
 		}
 		
 		setpoint += lines_forward;
 		
+		/*
 		if (ShooterEncoder->GetDistance() >= 50.0) {
+			m_state = CamShooter::ReadyToFire;
+		}
+		*/
+		if (setpoint >= 50.0) {
 			m_state = CamShooter::ReadyToFire;
 		}
 		
@@ -148,29 +161,11 @@ void CamShooter::SetPosition(float pos)
 }
 void CamShooter::logHeaders(ostream &f)
 {
-	/*
-	char * motor_names[4] = { "FrontLeft", "FrontRight", "RearLeft", "RearRight" };
-	char * header_names[3] = { "Setpoint","Output","Current"};
-	
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 3; j++) {
-			f << motor_names[i] << " " << header_names[j] << ","; 
-		}
-	}
-	*/
+	f << "ShooterMotorPositionSetpoint,ShooterMotorPositionActual,ShooterMotorDemand,CamIndex,";
 }
 void CamShooter::log(ostream &f)
 {
-	/*
-	//log for each module
-	
-	SpeedControlTalon * motors[4] = { FLMotor, FRMotor, RLMotor, RRMotor };
-	CurrentSensor * sensors[4] = { FLSensor, FRSensor, RLSensor, RRSensor };  
-	for (int i = 0; i < 4; i++) {
-		f << motors[i]->GetSetpoint() << "," <<  motors[i]->GetOutput() << ",";
-		f << sensors[i]->GetCurrent() << ",";
-	}
-	*/
+	f << PID->GetSetpoint() << "," << ShooterEncoder->GetDistance() << "," << ShooterMotor->Get() << "," << IndexTripped() << ",";
 }
 
 void CamShooter::Debug(ostream &out) 
@@ -178,9 +173,10 @@ void CamShooter::Debug(ostream &out)
 	out << "Encoder: " << fixed << setprecision(2) << ShooterEncoder->GetDistance()
 		<< " Setpoint: " << fixed << setprecision(2) << PID->GetSetpoint() 
 		<< " Motor: " << fixed << setprecision(2) << ShooterMotor->Get() 
-		<< " Sensor: " << (!!!IndexSensor->Get() ? "SEEN" : "")
+		<< " Sensor: " << (IndexTripped() ? "SEEN" : "")
 		
 		<< " State: " << CamShooter::StateNumberToString(m_state) << endl;
+	out.unsetf ( std::ios::fixed ); 
 }
 
 
