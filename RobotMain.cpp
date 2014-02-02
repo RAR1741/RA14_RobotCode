@@ -5,9 +5,12 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <exception>
 #include "Gamepad.h"
 #include "Config.h"
 #include "CurrentSensor.h"
+#include "TargetServer.h"
+#include "WPIErrors.h"
 
 using namespace std;
 
@@ -102,6 +105,16 @@ void RA14Robot::RobotInit() {
 	CurrentSensorReset = new DigitalOutput(5);
 	myCamera = new Relay(2);
 	cout << "CurrentSensor initialized." << endl;
+	
+	cout << "Target Server initializing..." << endl;
+	
+	/*
+	server = new TargetServer();
+	server->Start();
+	*/
+	//.preferences = Preferences::GetInstance();
+	//preferences->GetDouble("TestValue", -1);
+	cout << "Target server initialized." << endl;
 	
 	//cout << "Set period to 20Hz" << endl;
 	this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
@@ -221,6 +234,14 @@ void RA14Robot::TeleopPeriodic()
 	DriverRightY = DriverGamepad->GetRightY();
 	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
 	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
+	
+	//cout << "Stupid thing = " << preferences->GetDouble("TestValue", -1) << endl;
+	try {
+		cout << SmartDashboard::GetNumber("Thing") << endl;
+	} catch (exception ex) {
+		cerr << "Error occurred: " << ex.what() << endl;
+	}
+	
 	if (DriverGamepad->GetDPad()== Gamepad::kUp)
 	{
 		testTalon->Set(-.5);
@@ -281,7 +302,8 @@ void RA14Robot::TeleopPeriodic()
 	myDrive->Drive(DriverLeftY, DriverRightY);
 #endif	
 	//myDrive->Debug(cout);
-	myCam->Debug(cout);
+	//myCam->Debug(cout);
+	
 	
 	EndOfCycleMaintenance();
 	logging();
