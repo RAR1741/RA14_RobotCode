@@ -85,6 +85,7 @@ void RA14Robot::RobotInit() {
 	
 	cout << "Initializing drivetrain..." << endl;
 	//myDrive = new DriveTrain(1,2,3,4,1,2,3,4,1,2,3,4);
+	// int fl, int rl, int fr, int rr,
 	//myDrive = new DriveTrain(6,2,7,4,1,2,3,4 );
 	cout << "Drivetrain initialized." << endl;
 	
@@ -278,9 +279,8 @@ void RA14Robot::TeleopPeriodic()
 
 	
 	myDrive->Drive(DriverLeftY, DriverRightY);
-	
-	myDrive->Debug(cout);
-#endif
+#endif	
+	//myDrive->Debug(cout);
 	myCam->Debug(cout);
 	
 	EndOfCycleMaintenance();
