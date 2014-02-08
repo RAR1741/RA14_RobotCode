@@ -7,10 +7,10 @@
 
 using namespace std;
 
-
-DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward,int leftsolreverse,int rightsolforward,int rightsolreverse,
+DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int leftsolreverse, int rightsolforward, int rightsolreverse,
 		int leftencoder_a, int leftencoder_b, int rightencoder_a, int rightencoder_b)
 {
+	
 	FLMotor = new Talon(fl);
 	FRMotor = new Talon(fr);
 	RLMotor = new Talon(rl);
@@ -24,6 +24,17 @@ DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward,int lef
 	ConfigureEncoder(LEncoder);
 	ConfigureEncoder(REncoder);
 }
+
+/*DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int leftsolreverse, int rightsolforward, int rightsolreverse,
+		int leftencoder_a, int leftencoder_b, int rightencoder_a, int rightencoder_b)
+{
+	SpeedControlFLMotor = new SpeedControlTalon(fl,leftencoder_a,leftencoder_b);
+	SpeedControlFRMotor = new SpeedControlTalon(fr,rightencoder_a,rightencoder_b);
+	SpeedControlRLMotor = new SpeedControlTalon(rl,leftencoder_a,leftencoder_b);
+	SpeedControlRRMotor = new SpeedControlTalon(rr,rightencoder_a,rightencoder_b);
+	LeftSol = new DoubleSolenoid(leftsolforward,leftsolreverse);
+	RightSol = new DoubleSolenoid(rightsolforward,rightsolreverse);
+}*/
 
 DriveTrain::~DriveTrain()
 {
@@ -45,6 +56,7 @@ void DriveTrain::Drive(double LeftStickY, double RightStickY)
 	RRMotor->Set(DeadZone(float(RightStickY * -1)));
 	
 }
+
 void DriveTrain::ShiftUp() //Shifts to the higher gear
 {
 	LeftSol->Set(DoubleSolenoid::kReverse);

@@ -11,6 +11,8 @@
 #include "CurrentSensor.h"
 #include "TargetServer.h"
 #include "WPIErrors.h"
+#include "SpeedControlTalon.h"
+#include "Collection.h"
 
 using namespace std;
 
@@ -27,6 +29,7 @@ private:
 	Gamepad * DriverGamepad;
 	Gamepad * OperatorGamepad;
 	Compressor * myCompressor;
+	Collection * myCollection;
 	float DriverLeftY;
 	float DriverRightY;
 	bool DriverLeftBumper;
@@ -50,6 +53,7 @@ public:
 	OperatorGamepad = NULL;	
 	myCompressor = NULL;
 	myCamera = NULL;
+	myCollection = NULL;
 	DriverLeftY = 0.0;
 	DriverRightY = 0.0;  
 	DriverLeftBumper = true;
@@ -95,6 +99,10 @@ void RA14Robot::RobotInit() {
 	cout<<"Initializing current sensor.."<<endl;
 	mySensor = new CurrentSensor(7);
 	cout<<"Current sensor initialized."<<endl;
+	
+	cout<<"Initializing collection system"<<endl;
+	myCollection = new Collection(1,1,1); //Replace with appropriate values
+	cout<<"Collection system initialized"<<endl;
 	
 	cout << "Initializing gamepads..." << endl;
 	DriverGamepad = new Gamepad(1);
@@ -254,6 +262,15 @@ void RA14Robot::TeleopPeriodic()
 	{
 		testTalon->Set(0);
 		mySensor->Calibrate();
+	}
+	
+	if( DriverGamepad->GetBack() )
+	{
+		myCollection->Collect();
+	}
+	else
+	{
+		myCollection->ResetPosition();
 	}
 	
 	bool ShouldFire = DriverGamepad->GetRightTrigger();

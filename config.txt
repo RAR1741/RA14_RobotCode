@@ -26,3 +26,6 @@ target_g_up_limit = 255
 
 target_b_down_limit = 200
 target_b_up_limit = 255
+
+drive_encoderlines = 250
+drive_max_speed = 5000
