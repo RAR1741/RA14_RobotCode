@@ -13,6 +13,7 @@
 #include "WPIErrors.h"
 #include "SpeedControlTalon.h"
 #include "Collection.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -43,6 +44,7 @@ private:
 	bool alreadyInitialized;
 	
 	TargetServer * server;
+	Target * target;
 	
 public:
   RA14Robot()
@@ -66,6 +68,7 @@ public:
 	alreadyInitialized = false;
 	
 	server = NULL;
+	target = NULL;
   }
   
 /**
@@ -122,6 +125,7 @@ void RA14Robot::RobotInit() {
 	
 	
 	server = new TargetServer();
+	target = new Target();
 	//server->Start();
 	
 	//.preferences = Preferences::GetInstance();
@@ -254,7 +258,14 @@ void RA14Robot::TeleopPeriodic()
 		cerr << "Error occurred: " << ex.what() << endl;
 	}*/
 	
-	cout << server->GetLatestPacket() << endl;
+	//cout << "Latest packet: \"" << server->GetLatestPacket() << '"' << endl;
+	target->Parse(server->GetLatestPacket());
+	
+	if (target->IsValid()) {
+		cout << "A target! :D" << endl;
+		cout << "\tx = " << target->GetX() << ", y = " << target->GetY() << ", distance = " << target->GetDistance() << "ft" << endl;
+		cout << "side = " << (target->IsLeft() ? "LEFT" : "RIGHT") << ", hot = " << (target->IsHot() ? "HOT" : "NOT") << endl;
+	}
 	if (DriverGamepad->GetDPad()== Gamepad::kUp)
 	{
 		testTalon->Set(-.5);

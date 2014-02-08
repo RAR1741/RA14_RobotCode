@@ -153,7 +153,7 @@ int TargetServer::ServerTask()
                 return (ERROR); 
             }
             //cout << clientRequest << endl;
-            cout << "I recieved a message from the dashboard! '" << clientRequest << "'" << endl;
+            //cout << "I recieved a message from the dashboard! '" << clientRequest << "'" << endl;
             std::string temp(clientRequest);
             // Leave me alone for a while while I copy this here string.
             /*if (semTake(m_newTargetSem, 200) != OK) {
