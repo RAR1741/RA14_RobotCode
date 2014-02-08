@@ -42,6 +42,8 @@ private:
 	bool recentlyPressed;
 	bool alreadyInitialized;
 	
+	TargetServer * server;
+	
 public:
   RA14Robot()
   {
@@ -62,6 +64,8 @@ public:
 	ResetSetting = false;
 	recentlyPressed = false;
 	alreadyInitialized = false;
+	
+	server = NULL;
   }
   
 /**
@@ -116,10 +120,10 @@ void RA14Robot::RobotInit() {
 	
 	cout << "Target Server initializing..." << endl;
 	
-	/*
+	
 	server = new TargetServer();
-	server->Start();
-	*/
+	//server->Start();
+	
 	//.preferences = Preferences::GetInstance();
 	//preferences->GetDouble("TestValue", -1);
 	cout << "Target server initialized." << endl;
@@ -244,12 +248,13 @@ void RA14Robot::TeleopPeriodic()
 	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
 	
 	//cout << "Stupid thing = " << preferences->GetDouble("TestValue", -1) << endl;
-	try {
+	/*try {
 		cout << SmartDashboard::GetNumber("Thing") << endl;
 	} catch (exception ex) {
 		cerr << "Error occurred: " << ex.what() << endl;
-	}
+	}*/
 	
+	cout << server->GetLatestPacket() << endl;
 	if (DriverGamepad->GetDPad()== Gamepad::kUp)
 	{
 		testTalon->Set(-.5);
