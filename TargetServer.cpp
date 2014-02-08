@@ -144,7 +144,7 @@ int TargetServer::ServerTask()
     		for (unsigned int i = 0; i < sizeof(clientRequest); ++i) {
     			clientRequest[i] = 0;
     		}
-    		printf("Waiting for a packet...\n");
+    		//printf("Waiting for a packet...\n");
             if (recvfrom (sFd, (char *) &clientRequest, sizeof (clientRequest), 0, 
                 (struct sockaddr *) &clientAddr, &sockAddrSize) == ERROR) 
             { 

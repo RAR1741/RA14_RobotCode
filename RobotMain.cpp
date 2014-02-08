@@ -25,7 +25,7 @@ private:
 	CamShooter * myCam;
 	CANJaguar * myJag;
 	DriveTrain * myDrive;
-	CurrentSensor * mySensor;
+	CurrentSensor * myCurrentSensor;
 	Relay * myCamera;
 	Gamepad * DriverGamepad;
 	Gamepad * OperatorGamepad;
@@ -35,6 +35,7 @@ private:
 	float DriverRightY;
 	bool DriverLeftBumper;
 	bool DriverRightBumper;
+	bool ShouldFire;
 	
 	DigitalOutput * CurrentSensorReset;
 	
@@ -50,7 +51,7 @@ public:
   RA14Robot()
   {
 	testTalon = NULL;
-	mySensor = NULL;
+	myCurrentSensor = NULL;
 	myCam = NULL;
 	myDrive = NULL;  
 	DriverGamepad = NULL;
@@ -66,6 +67,7 @@ public:
 	ResetSetting = false;
 	recentlyPressed = false;
 	alreadyInitialized = false;
+	ShouldFire = false;
 	
 	server = NULL;
 	target = NULL;
@@ -104,7 +106,7 @@ void RA14Robot::RobotInit() {
 	cout << "Drivetrain initialized." << endl;
 	
 	cout<<"Initializing current sensor.."<<endl;
-	mySensor = new CurrentSensor(7);
+	myCurrentSensor = new CurrentSensor(7);
 	cout<<"Current sensor initialized."<<endl;
 	
 	cout<<"Initializing collection system"<<endl;
@@ -244,42 +246,36 @@ void RA14Robot::TeleopInit() {
  */
 void RA14Robot::TeleopPeriodic() 
 {
-	mySensor->Toggle(DriverGamepad->GetStart());
 	StartOfCycleMaintenance();
+
+	//Input Acquisition
 	DriverLeftY = DriverGamepad->GetLeftY();
 	DriverRightY = DriverGamepad->GetRightY();
 	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
 	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
+	ShouldFire = DriverGamepad->GetRightTrigger();
+	//End Input Acquisition
 	
-	//cout << "Stupid thing = " << preferences->GetDouble("TestValue", -1) << endl;
-	/*try {
-		cout << SmartDashboard::GetNumber("Thing") << endl;
-	} catch (exception ex) {
-		cerr << "Error occurred: " << ex.what() << endl;
-	}*/
 	
-	//cout << "Latest packet: \"" << server->GetLatestPacket() << '"' << endl;
+	//Current Sensing
+	myCurrentSensor->Toggle(DriverGamepad->GetStart());
+	//End Current Sensing
+	
+	
+	//Target Processing
 	target->Parse(server->GetLatestPacket());
 	
 	if (target->IsValid()) {
-		cout << "A target! :D" << endl;
-		cout << "\tx = " << target->GetX() << ", y = " << target->GetY() << ", distance = " << target->GetDistance() << "ft" << endl;
-		cout << "side = " << (target->IsLeft() ? "LEFT" : "RIGHT") << ", hot = " << (target->IsHot() ? "HOT" : "NOT") << endl;
+		cout << "\tx = " << target->GetX() << ", y = " << target->GetY() << ", distance = " << target->GetDistance() << "ft";
+		cout << "\tside = " << (target->IsLeft() ? "LEFT" : "RIGHT") << ", hot = " << (target->IsHot() ? "HOT" : "NOT") << endl;
 	}
-	if (DriverGamepad->GetDPad()== Gamepad::kUp)
-	{
-		testTalon->Set(-.5);
+	else {
+		cout << "No Target Received..." << endl;
 	}
-	else if (DriverGamepad->GetDPad()== Gamepad::kDown)
-	{
-		testTalon->Set(.5);
-	}
-	else
-	{
-		testTalon->Set(0);
-		mySensor->Calibrate();
-	}
+	//End Target Processing
 	
+	
+	//Ball Collection
 	if( DriverGamepad->GetBack() )
 	{
 		myCollection->Collect();
@@ -288,24 +284,24 @@ void RA14Robot::TeleopPeriodic()
 	{
 		myCollection->ResetPosition();
 	}
+	//End Ball Collection
 	
-	bool ShouldFire = DriverGamepad->GetRightTrigger();
 	
+	//Fire Control
 	myCam->Process(ShouldFire);
 	
 	if(DriverGamepad->GetA())
 	{
-		//myCam->SetPosition(true);
-		//myJag->Set(-0.25);
 		myCam->SetPosition(90);
 	}
 	if(DriverGamepad->GetB())
 	{
-		//myCam->SetPosition(false);
-		//myJag->Set(0.25);
 		myCam->SetPosition(110);
 	}
+	//End Fire Control
 	
+	
+	//Ring Light
 	if(DriverGamepad->GetY())
 	{
 		recentlyPressed = true;
@@ -320,8 +316,12 @@ void RA14Robot::TeleopPeriodic()
 		
 		recentlyPressed = false;
 	}
-	//cout<<"The position is "<<myCam->GetPosition()<<endl;
+	//End Ring Light
+	
+	
 #if 0
+	
+	//Drive Processing
 	if(DriverLeftBumper)
 	{
 		myDrive->ShiftUp();
@@ -330,16 +330,14 @@ void RA14Robot::TeleopPeriodic()
 	{
 		myDrive->ShiftDown();
 	}
-
 	
 	myDrive->Drive(DriverLeftY, DriverRightY);
+	//End Drive Processing
 #endif	
-	//myDrive->Debug(cout);
-	//myCam->Debug(cout);
-	
-	
-	EndOfCycleMaintenance();
+
 	logging();
+	target->Parse("");
+	EndOfCycleMaintenance();
 }
 
 /**
