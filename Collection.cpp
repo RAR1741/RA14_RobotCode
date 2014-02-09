@@ -24,3 +24,13 @@ void Collection::ResetPosition()
 	collectSol->Set(DoubleSolenoid::kReverse);
 	spinWheel->Set(0);
 }
+
+void Collection::SpinMotor()
+{
+	spinWheel->Set(1);
+}
+
+void Collection::ActuatePneumatics()
+{
+	collectSol->Set(DoubleSolenoid::kForward);
+}

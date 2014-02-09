@@ -8,6 +8,8 @@ public:
 	~Collection();
 	void Collect();
 	void ResetPosition();
+	void SpinMotor();
+	void ActuatePneumatics();
 	
 private:
 	DoubleSolenoid * collectSol;

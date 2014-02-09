@@ -244,7 +244,7 @@ void RA14Robot::TeleopInit() {
 void RA14Robot::TeleopPeriodic() 
 {
 	StartOfCycleMaintenance();
-
+	
 	//Input Acquisition
 	DriverLeftY = DriverGamepad->GetLeftY();
 	DriverRightY = DriverGamepad->GetRightY();
@@ -306,9 +306,7 @@ void RA14Robot::TeleopPeriodic()
 		recentlyPressed = false;
 	}
 	//End Ring Light
-	
-	
-#if 0
+
 	
 	//Drive Processing
 	if(DriverLeftBumper)
@@ -322,8 +320,7 @@ void RA14Robot::TeleopPeriodic()
 	
 	myDrive->Drive(DriverLeftY, DriverRightY);
 	//End Drive Processing
-#endif	
-
+	
 	logging();
 	target->Parse("");
 	EndOfCycleMaintenance();
@@ -362,8 +359,6 @@ void RA14Robot::logging()
 	myCam->log(fout);
 	fout << endl;
 }
-
-
 
 };
 
