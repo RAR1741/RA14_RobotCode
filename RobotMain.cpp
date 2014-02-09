@@ -20,7 +20,6 @@ using namespace std;
 class RA14Robot : public IterativeRobot
 {
 private:
-	Talon * testTalon;
 	ofstream fout;
 	CamShooter * myCam;
 	CANJaguar * myJag;
@@ -50,7 +49,6 @@ private:
 public:
   RA14Robot()
   {
-	testTalon = NULL;
 	myCurrentSensor = NULL;
 	myCam = NULL;
 	myDrive = NULL;  
@@ -80,7 +78,6 @@ public:
  * be called when the robot is first powered on.  It will be called exactly 1 time.
  */
 void RA14Robot::RobotInit() {
-	testTalon = new Talon(7);
 
 	cout << "Initializing SmartDashboard..." << endl;
 	SmartDashboard::init();	
@@ -290,14 +287,6 @@ void RA14Robot::TeleopPeriodic()
 	//Fire Control
 	myCam->Process(ShouldFire);
 	
-	if(DriverGamepad->GetA())
-	{
-		myCam->SetPosition(90);
-	}
-	if(DriverGamepad->GetB())
-	{
-		myCam->SetPosition(110);
-	}
 	//End Fire Control
 	
 	
