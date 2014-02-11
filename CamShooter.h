@@ -25,12 +25,12 @@ public:
 	
 	void Reset();
 private:
-	bool IndexTripped() { return !!!IndexSensor->Get(); } 
+	bool IndexTripped() { return !!IndexSensor->Get(); } 
 	Talon * ShooterMotorLeft;
 	Talon * ShooterMotorRight;
 	Encoder * ShooterEncoder;
 	DigitalInput * IndexSensor;
-	PIDController * PIDLeft;
+	PIDController * PID;
 	PIDController * PIDRight;
 	bool IndexSeenLastSample;  // Was the index pulse seen during the last sample
 	//MotionProfile * CamProfile;
