@@ -8,6 +8,28 @@
 #include <iostream>
 #include <iomanip>
 
+
+class CamMotors : public PIDOutput {
+public:
+	CamMotors(Talon * left, Talon * right) {
+		l = left;
+		r = right;
+	}
+	
+	virtual ~CamMotors() {
+		delete l;
+		delete r;
+	}
+	void PIDWrite(float out)
+	{
+		l->Set(out);
+		r->Set(-out);
+	}
+private:
+	Talon * l, *r;
+	
+};
+
 class CamShooter
 {
 public:
@@ -25,6 +47,7 @@ public:
 	
 	void Reset();
 private:
+	CamMotors * cam_outputter;
 	bool IndexTripped() { return !!IndexSensor->Get(); } 
 	Talon * ShooterMotorLeft;
 	Talon * ShooterMotorRight;

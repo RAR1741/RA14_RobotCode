@@ -10,11 +10,15 @@ using namespace std;
 #define CAM_FIRE_TO_POSITION ( Config::GetSetting("cam_fire_to_position", 45) )
 #define CAM_FIRE_POSITION_TOLERANCE ( Config::GetSetting("cam_fire_position_tolerance",3) )
 
+
+
 CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB, int indexInput)
 {
+	
 	const float lines_per_rev = 2;
 	ShooterMotorLeft = new Talon(motorLeft);
 	ShooterMotorRight = new Talon(motorRight);
+	cam_outputter = new CamMotors(ShooterMotorLeft, ShooterMotorRight);
 	ShooterEncoder = new Encoder(encoderA, encoderB, false, Encoder::k4X);
 	IndexSensor = new DigitalInput(indexInput);
 	
@@ -29,8 +33,8 @@ CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB,
 								Config::GetSetting("cam_i", 0.005), 
 								Config::GetSetting("cam_d", 0.03), 
 								ShooterEncoder, 
-								ShooterMotorLeft);
-	PID->SetInputRange(0, lines_per_rev);
+								cam_outputter);
+	PID->SetInputRange(0, 100);
 	PID->SetOutputRange(-1, 1);
 	PID->SetContinuous(true);
 	
@@ -176,7 +180,7 @@ void CamShooter::Process(bool fire)
 void CamShooter::SetPosition(float pos)
 {
 
-	PID->SetSetpoint(pos);
+	//PID->SetSetpoint(pos);
 	////PIDRight->SetSetpoint(pos);
 }
 void CamShooter::logHeaders(ostream &f)
