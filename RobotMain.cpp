@@ -92,14 +92,11 @@ void RA14Robot::RobotInit() {
 	cout << "Compressor initialized." << endl;
 	
 	cout << "Initializing cam shooter..." << endl;
-	myCam = new CamShooter(1, 1, 2, 3);
-	//myJag = new CANJaguar(14,CANJaguar::kPercentVbus);
+	myCam = new CamShooter(5, 6, 2, 1, 3);
 	cout << "Cam shooter initialized." << endl;
 	
 	cout << "Initializing drivetrain..." << endl;
-	//myDrive = new DriveTrain(1,2,3,4,1,2,3,4,1,2,3,4);
-	// int fl, int rl, int fr, int rr,
-	//myDrive = new DriveTrain(6,2,7,4,1,2,3,4 );
+	myDrive = new DriveTrain(1,2,3,4, 1,2,3,4, 4,5,6,7);
 	cout << "Drivetrain initialized." << endl;
 	
 	cout<<"Initializing current sensor.."<<endl;
@@ -116,22 +113,15 @@ void RA14Robot::RobotInit() {
 	cout << "Gamepads initialized." << endl;
 	
 	cout << "Initializing CurrentSensor..." << endl;
-	CurrentSensorReset = new DigitalOutput(5);
+	CurrentSensorReset = new DigitalOutput(12);
 	myCamera = new Relay(2);
 	cout << "CurrentSensor initialized." << endl;
 	
 	cout << "Target Server initializing..." << endl;
-	
-	
 	server = new TargetServer();
 	target = new Target();
-	//server->Start();
-	
-	//.preferences = Preferences::GetInstance();
-	//preferences->GetDouble("TestValue", -1);
 	cout << "Target server initialized." << endl;
 	
-	//cout << "Set period to 20Hz" << endl;
 	this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
 	cout << "Period set to " << this->GetLoopsPerSec() << "Hz" << endl;
 	

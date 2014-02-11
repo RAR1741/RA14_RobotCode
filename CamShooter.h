@@ -11,7 +11,7 @@
 class CamShooter
 {
 public:
-	CamShooter(int motor, int encoderA, int encoderB, int indexInput);
+	CamShooter(int motorLeft, int motorRight, int encoderA, int encoderB, int indexInput);
 	~CamShooter();
 	
 	//Functions
@@ -26,11 +26,12 @@ public:
 	void Reset();
 private:
 	bool IndexTripped() { return !!!IndexSensor->Get(); } 
-	void InitializeProfile();
-	Talon * ShooterMotor;
+	Talon * ShooterMotorLeft;
+	Talon * ShooterMotorRight;
 	Encoder * ShooterEncoder;
 	DigitalInput * IndexSensor;
-	PIDController * PID;
+	PIDController * PIDLeft;
+	PIDController * PIDRight;
 	bool IndexSeenLastSample;  // Was the index pulse seen during the last sample
 	//MotionProfile * CamProfile;
 	
