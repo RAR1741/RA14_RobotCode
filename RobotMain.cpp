@@ -34,13 +34,15 @@ private:
 	float DriverRightY;
 	bool DriverLeftBumper;
 	bool DriverRightBumper;
-	bool ShouldFire;
+	bool ShouldFireButton;
+	bool RingLightButton;
+	bool BallCollectPickupButton;
 	
 	DigitalOutput * CurrentSensorReset;
 	
 	bool ResetSetting;
 	
-	bool recentlyPressed;
+	bool RingLightButtonRecentlyPressed;
 	bool alreadyInitialized;
 	
 	TargetServer * server;
@@ -63,9 +65,11 @@ public:
 	DriverRightBumper = true;
 	CurrentSensorReset = NULL;
 	ResetSetting = false;
-	recentlyPressed = false;
+	RingLightButtonRecentlyPressed = false;
+	RingLightButton = false;
 	alreadyInitialized = false;
-	ShouldFire = false;
+	ShouldFireButton = false;
+	BallCollectPickupButton = false;
 	
 	server = NULL;
 	target = NULL;
@@ -240,7 +244,9 @@ void RA14Robot::TeleopPeriodic()
 	DriverRightY = DriverGamepad->GetRightY();
 	DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
 	DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
-	ShouldFire = DriverGamepad->GetRightTrigger();
+	RingLightButton = DriverGamepad->GetY();
+	ShouldFireButton = DriverGamepad->GetRightTrigger();
+	BallCollectPickupButton = DriverGamepad->GetBack();
 	//End Input Acquisition
 	
 	
@@ -252,6 +258,8 @@ void RA14Robot::TeleopPeriodic()
 	//Target Processing
 	target->Parse(server->GetLatestPacket());
 	
+	
+	/*
 	if (target->IsValid()) {
 		cout << "\tx = " << target->GetX() << ", y = " << target->GetY() << ", distance = " << target->GetDistance() << "ft";
 		cout << "\tside = " << (target->IsLeft() ? "LEFT" : "RIGHT") << ", hot = " << (target->IsHot() ? "HOT" : "NOT") << endl;
@@ -259,11 +267,13 @@ void RA14Robot::TeleopPeriodic()
 	else {
 		cout << "No Target Received..." << endl;
 	}
+	*/
+	
 	//End Target Processing
 	
 	
 	//Ball Collection
-	if( DriverGamepad->GetBack() )
+	if(BallCollectPickupButton)
 	{
 		myCollection->Collect();
 	}
@@ -275,25 +285,27 @@ void RA14Robot::TeleopPeriodic()
 	
 	
 	//Fire Control
-	myCam->Process(ShouldFire);
+	myCam->Process(ShouldFireButton);
+	
+	myCam->Debug(cout);
 	
 	//End Fire Control
 	
 	
 	//Ring Light
-	if(DriverGamepad->GetY())
+	if(RingLightButton)
 	{
-		recentlyPressed = true;
+		RingLightButtonRecentlyPressed = true;
 	}
 	
-	if(!DriverGamepad->GetY() && recentlyPressed)
+	if(!RingLightButton && RingLightButtonRecentlyPressed)
 	{
 		if(myCamera->Get() == Relay::kOff)
 			myCamera->Set(Relay::kForward);
 		else
 			myCamera->Set(Relay::kOff);
 		
-		recentlyPressed = false;
+		RingLightButtonRecentlyPressed = false;
 	}
 	//End Ring Light
 
