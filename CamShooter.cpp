@@ -154,6 +154,7 @@ void CamShooter::Process(bool fire)
 		setpoint = CAM_FIRE_TO_POSITION;
 		
 		if (ShooterEncoder->GetDistance() >= (CAM_FIRE_TO_POSITION - 1)) {
+			setpoint = ShooterEncoder->GetDistance(); // make sure we don't back-drive
 			m_state = CamShooter::Rearming;
 		}
 		break;
