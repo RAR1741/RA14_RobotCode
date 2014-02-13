@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <iostream>
 #include <iomanip>
+#include "RAUtils.h"
 
 
 class CamMotors : public PIDOutput {
@@ -17,8 +18,8 @@ public:
 	}
 	
 	virtual ~CamMotors() {
-		delete l;
-		delete r;
+		/*delete l;
+		delete r; */
 	}
 	void PIDWrite(float out)
 	{
@@ -63,6 +64,7 @@ private:
 		Firing      = 2,        // Releasing cam
 		Rearming    = 3,        // Rearming
 		Calibration  = 4,
+		Testing     = 5,        // test mode. Doesn't try and do anything else
 	} CamShooterState;
 	int m_state;
 	

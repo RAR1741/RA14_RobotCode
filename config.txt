@@ -1,8 +1,8 @@
 # config.txt
 # CAM PID
-cam_p = 0.017
+cam_p = 0.030 # MR. MEYER SAYS THIS IS OK :(
 cam_i = 0.0005
-cam_d = 0.00
+cam_d = 0.004 # RICH SAYS THIS IS OK :?
 
 # Robot Loop period
 robot_loop_period = .05
@@ -10,7 +10,7 @@ robot_loop_period = .05
 # CAM
 robot_cam_rearm_rate = 50
 cam_ready_to_fire_position = 50
-cam_fire_to_position = 65
+cam_fire_to_position = 60
 cam_fire_position_tolerance = 2
 
 # Camera meta-config (meant for dashboard, not robot)
