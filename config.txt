@@ -12,6 +12,7 @@ robot_cam_rearm_rate = 50
 cam_ready_to_fire_position = 50
 cam_fire_to_position = 60
 cam_fire_position_tolerance = 2
+cam_setpoint_error_limit = 25
 
 # Camera meta-config (meant for dashboard, not robot)
 target_r = 55

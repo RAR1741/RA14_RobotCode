@@ -10,6 +10,7 @@ using namespace std;
 #define CAM_FIRE_TO_POSITION ( Config::GetSetting("cam_fire_to_position", 45) )
 #define CAM_FIRE_POSITION_TOLERANCE ( Config::GetSetting("cam_fire_position_tolerance",3) )
 #define CAM_POINT_OF_NO_RETURN ( Config::GetSetting("cam_point_of_no_return", 58) )
+#define CAM_SETPOINT_ERROR_LIMIT ( Config::GetSetting("cam_setpoint_error_limit", 25))
 
 CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB, int indexInput)
 {
@@ -139,7 +140,9 @@ void CamShooter::Process(bool fire)
 	}
 	switch (m_state) {
 	case CamShooter::Rearming:
-		setpoint += lines_forward;
+		if (::fabs(ShooterEncoder->GetDistance() - setpoint) <= CAM_SETPOINT_ERROR_LIMIT) {
+			setpoint += lines_forward;
+		}
 
 		if (::fabs(CAM_READY_TO_FIRE_POSITION - setpoint) < CAM_FIRE_POSITION_TOLERANCE) {
 			m_state = CamShooter::ReadyToFire;
@@ -166,8 +169,9 @@ void CamShooter::Process(bool fire)
 		}
 		break;
 	case CamShooter::Calibration:
-		cout << "setpoint inside calibration " << setpoint << endl;
-		setpoint += lines_forward;
+		if (::fabs(ShooterEncoder->GetDistance() - setpoint) <= CAM_SETPOINT_ERROR_LIMIT) {
+			setpoint += lines_forward;
+		}
 		if(IndexHasBeenReset){
 			m_state = CamShooter::Rearming;
 		}
