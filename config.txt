@@ -2,7 +2,7 @@
 # CAM PID
 cam_p = 0.030 # MR. MEYER SAYS THIS IS OK :(
 cam_i = 0.0005
-cam_d = 0.008 # RICH SAYS THIS IS OK :?
+cam_d = 0.020 # RICH SAYS THIS IS OK :?
 
 # Robot Loop period
 robot_loop_period = .05
