@@ -14,8 +14,8 @@ using namespace std;
 
 CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB, int indexInput)
 {
-	const float lines_per_rev = 4;
-	const float gear_reduction_ratio = 8.64; 
+	const float lines_per_rev = 360;
+	const float gear_reduction_ratio = (2250/49);
 	ShooterMotorLeft = new Talon(motorLeft);
 	ShooterMotorRight = new Talon(motorRight);
 	cam_outputter = new CamMotors(ShooterMotorLeft, ShooterMotorRight);
@@ -193,7 +193,6 @@ void CamShooter::Process(bool fire)
 }
 void CamShooter::SetPosition(float pos)
 {
-
 	//PID->SetSetpoint(pos);
 	////PIDRight->SetSetpoint(pos);
 }
@@ -205,8 +204,6 @@ void CamShooter::log(ostream &f)
 {
 	f << PID->GetSetpoint() << "," << ShooterEncoder->GetDistance() << "," << ShooterMotorLeft->Get() << "," << IndexTripped() << ",";
 	f << m_state;
-	
-
 }
 
 void CamShooter::Debug(ostream &out) 
