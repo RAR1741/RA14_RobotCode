@@ -15,7 +15,7 @@ using namespace std;
 CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB, int indexInput)
 {
 	const float lines_per_rev = 360;
-	const float gear_reduction_ratio = (2250/49);
+	const float gear_reduction_ratio = (2250.0/49.0);
 	ShooterMotorLeft = new Talon(motorLeft);
 	ShooterMotorRight = new Talon(motorRight);
 	cam_outputter = new CamMotors(ShooterMotorLeft, ShooterMotorRight);
@@ -34,7 +34,7 @@ CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB,
 								Config::GetSetting("cam_d", 0.03), 
 								ShooterEncoder, 
 								cam_outputter);
-	PID->SetInputRange(0, 100);
+	PID->SetInputRange(0, 110);
 	PID->SetOutputRange(-1, 1);
 	PID->SetContinuous(true);
 	
@@ -155,10 +155,11 @@ void CamShooter::Process(bool fire)
 		if (!FireButtonLast && FireButton) {
 			m_state = CamShooter::Firing;
 		}
-		/*
+		
 		if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
 			m_state = CamShooter::Firing;
-		}*/
+			cout << "OK, I guess we're firing now. Fine. Whatever." << endl;
+		}
 		break;
 	case CamShooter::Firing:
 		setpoint = CAM_FIRE_TO_POSITION;

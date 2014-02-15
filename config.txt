@@ -1,16 +1,17 @@
 # config.txt
 # CAM PID
-cam_p = 0.030 # MR. MEYER SAYS THIS IS OK :(
+cam_p = 0.180 # MR. MEYER SAYS THIS IS OK :(
 cam_i = 0.0005
-cam_d = 0.020 # RICH SAYS THIS IS OK :?
+cam_d = 0.025 # RICH SAYS THIS IS OK :?
 
 # Robot Loop period
-robot_loop_period = .05
+robot_loop_period = .03
 
 # CAM
-robot_cam_rearm_rate = 50
-cam_ready_to_fire_position = 50
-cam_fire_to_position = 60
+robot_cam_rearm_rate = 25
+cam_ready_to_fire_position = 53
+cam_fire_to_position = 63
+cam_point_of_no_return = 58
 cam_fire_position_tolerance = 2
 cam_setpoint_error_limit = 25
 

@@ -108,7 +108,7 @@ void RA14Robot::RobotInit() {
 	cout<<"Current sensor initialized."<<endl;
 	
 	cout<<"Initializing collection system"<<endl;
-	myCollection = new Collection(1,1,1); //Replace with appropriate values
+	myCollection = new Collection(7,3,4);
 	cout<<"Collection system initialized"<<endl;
 	
 	cout << "Initializing gamepads..." << endl;
