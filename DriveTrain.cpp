@@ -7,7 +7,7 @@
 
 using namespace std;
 
-DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int leftsolreverse, int rightsolforward, int rightsolreverse,
+DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int leftsolreverse,
 		int leftencoder_a, int leftencoder_b, int rightencoder_a, int rightencoder_b)
 {
 	
@@ -16,7 +16,7 @@ DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int le
 	RLMotor = new Talon(rl);
 	RRMotor = new Talon(rr);
 	LeftSol = new DoubleSolenoid(leftsolforward,leftsolreverse);
-	RightSol = new DoubleSolenoid(rightsolforward,rightsolreverse);
+	//RightSol = new DoubleSolenoid(rightsolforward,rightsolreverse);
 	
 	LEncoder = new Encoder(leftencoder_a, leftencoder_b );
 	REncoder = new Encoder(rightencoder_a, rightencoder_b);
@@ -44,29 +44,34 @@ void DriveTrain::Debug(ostream & out)
 {
 	out << "Left: " << setw(10) << LEncoder->GetRate();
 	out << "Right: " << setw(10) << REncoder->GetRate();
+	
 	out << endl;
 }
 
 void DriveTrain::Drive(double LeftStickY, double RightStickY)
 {
+	float left = DeadZone(float(LeftStickY));
+	float right = DeadZone(float(RightStickY * -1));
 	
-	FLMotor->Set(DeadZone(float(LeftStickY)));
-	RLMotor->Set(DeadZone(float(LeftStickY)));
-	FRMotor->Set(DeadZone(float(RightStickY * -1)));
-	RRMotor->Set(DeadZone(float(RightStickY * -1)));
+	cout << "Left drive: " << left << "\nRight drive: " << right << endl;
+	
+	FLMotor->Set(left);
+	RLMotor->Set(left);
+	FRMotor->Set(right);
+	RRMotor->Set(right);
 	
 }
 
 void DriveTrain::ShiftUp() //Shifts to the higher gear
 {
 	LeftSol->Set(DoubleSolenoid::kReverse);
-	RightSol->Set(DoubleSolenoid::kReverse);
+	//RightSol->Set(DoubleSolenoid::kReverse);
 	//cout<<"ShiftUp"<<endl;
 }
 void DriveTrain::ShiftDown() //Shifts to the lower gear
 {
 	LeftSol->Set(DoubleSolenoid::kForward);
-	RightSol->Set(DoubleSolenoid::kForward);
+	//RightSol->Set(DoubleSolenoid::kForward);
 	//cout<<"ShiftDown"<<endl;
 }
 
@@ -95,9 +100,15 @@ void DriveTrain::logHeaders(ostream &f)
 		}
 	}
 	*/
+	f << "FrontLeftMotorOutput,FrontRightMotorOutput,RearLeftMotorOutput,RearRightMotorOutput,LeftEncoder,RightEncoder,";
 }
 void DriveTrain::log(ostream &f)
 {
+	Talon * motors[4] = { FLMotor, FRMotor, RLMotor, RRMotor };
+	for (int i = 0; i < 4; i++) {
+		f << motors[i]->Get() << ",";
+	}
+	f << LEncoder->GetRate() << "," << REncoder->GetRate() << ",";
 	/*
 	//log for each module
 	

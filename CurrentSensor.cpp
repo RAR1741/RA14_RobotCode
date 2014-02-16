@@ -1,8 +1,7 @@
 #include "CurrentSensor.h"
-
 using namespace std;
 
-CurrentSensor::CurrentSensor(int channel)
+CurrentSensorSlot::CurrentSensorSlot(int channel)
 	: AnalogChannel(channel){
 	DCOffset = 2.385;
 	toggle = 0;
@@ -10,33 +9,47 @@ CurrentSensor::CurrentSensor(int channel)
 	total = 0.0;
 	kAmpsPerVolt = 50.0;
 	dig = new DigitalOutput(10);
+	sample_queue = new std::queue<double>();
 }
-CurrentSensor::CurrentSensor(int module, int channel)
+CurrentSensorSlot::CurrentSensorSlot(int module, int channel)
 	: AnalogChannel(module, channel)
 {
+	count = 0;
+	total = 0.0;
+	kAmpsPerVolt = 50.0;
+	dig = new DigitalOutput(10);
 	toggle = 0;
 	dig = new DigitalOutput(10);
+	
+	sample_queue = new std::queue<double>();
 }
-void CurrentSensor::Calibrate()
+void CurrentSensorSlot::Calibrate()
 {
 	DCOffset = 0.99*DCOffset + 0.01*(this->GetVoltage());
 }
-CurrentSensor::~CurrentSensor()
+CurrentSensorSlot::~CurrentSensorSlot()
 {
 	
 }
-void CurrentSensor::Toggle(int toggleInput)
+
+double CurrentSensorSlot::Get()
 {
-	if (count++ < 10)
-	{
-		total += (this->GetVoltage() - DCOffset) * kAmpsPerVolt;
-	}
-	else
-	{
-		dig->Set(1); //Reseting the peak detector
-		//cout<<"Average: "<<total*.1<<" ( "<<DCOffset<<" )"<<endl;
-		total = 0;
-		count = 0;
-		dig->Set(0); //Release peak detector from reset
+	if (sample_queue->size() == 0) return 0;
+	return total / sample_queue->size();
+}
+
+void CurrentSensorSlot::Process()
+{
+	double sample = (this->GetVoltage() - DCOffset) * kAmpsPerVolt;
+	
+	double old_value = sample_queue->front();
+	sample_queue->push(sample);
+	total += sample;
+	
+	if (sample_queue->size() > 10) {
+		sample_queue->pop();
+		total -= old_value;
+		
 	}
 }
+

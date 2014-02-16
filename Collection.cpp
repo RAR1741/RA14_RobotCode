@@ -25,12 +25,18 @@ void Collection::ResetPosition()
 	spinWheel->Set(0);
 }
 
-void Collection::SpinMotor()
+void Collection::SpinMotor(float percent)
 {
-	spinWheel->Set(1);
+	spinWheel->Set(percent);
 }
 
-void Collection::ActuatePneumatics()
+
+void Collection::ExtendArm()
 {
 	collectSol->Set(DoubleSolenoid::kForward);
 }
+void Collection::RetractArm()
+{
+	collectSol->Set(DoubleSolenoid::kReverse);
+}
+

@@ -48,7 +48,6 @@ public:
     
 
     DPadDirection GetDPad();
-
 protected:
     static const UINT32 kLeftXAxisNum = 1;
     static const UINT32 kLeftYAxisNum = 2;

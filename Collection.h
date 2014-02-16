@@ -8,9 +8,11 @@ public:
 	~Collection();
 	void Collect();
 	void ResetPosition();
-	void SpinMotor();
-	void ActuatePneumatics();
+	void SpinMotor(float percent);
+	void ExtendArm();
+	void RetractArm();
 	
+	bool IsExtended() { return collectSol->Get() == DoubleSolenoid::kForward; }
 private:
 	DoubleSolenoid * collectSol;
 	Talon * spinWheel;

@@ -10,11 +10,11 @@ class DriveTrain
 public:
 	//Constructors and deconstructors
 	DriveTrain(int fl, int rl, int fr, int rr,
-			int leftsolforward, int leftsolreverse, int rightsolforward, int rightsolreverse,
+			int leftsolforward, int leftsolreverse,
 			int leftencoder_a, int leftencoder_b,
 			int rightencoder_a, int rightencoder_b);
 	DriveTrain(int fl, int rl, int fr, int rr,
-			int leftsolforward, int leftsolreverse, int rightsolforward, int rightsolreverse,
+			int leftsolforward, int leftsolreverse,
 			int leftencoder_a, int leftencoder_b,
 			int rightencoder_a, int rightencoder_b,
 			int sensor1, int sensor2, int sensor3, int sensor4);

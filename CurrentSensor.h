@@ -1,15 +1,18 @@
 #include "WPILib.h"
 #include <iostream>
+#include <queue>
 
-class CurrentSensor : public AnalogChannel
+class CurrentSensorSlot : public AnalogChannel
 {
 public:
-	CurrentSensor(int channel);
-	CurrentSensor(int channel, int module);
+	CurrentSensorSlot(int channel);
+	CurrentSensorSlot(int channel, int module);
+	~CurrentSensorSlot();
 	void Calibrate();
-	~CurrentSensor();
-	void Toggle(int toggleInput);
+	double Get();
+	void Process();
 private:
+	std::queue<double> *sample_queue;
 	double total;
 	int count;
 	int toggle;
