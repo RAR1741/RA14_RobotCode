@@ -22,12 +22,11 @@ CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB,
 	ShooterEncoder = new Encoder(encoderA, encoderB, false, Encoder::k4X);
 	IndexSensor = new DigitalInput(indexInput);
 	
-	ShooterEncoder->SetDistancePerPulse(100.0 / (gear_reduction_ratio * lines_per_rev) );
+	//ShooterEncoder->SetDistancePerPulse(100.0 / (gear_reduction_ratio * lines_per_rev) );
+	ShooterEncoder->SetDistancePerPulse(1);
 	ShooterEncoder->SetPIDSourceParameter(Encoder::kDistance);
 	ShooterEncoder->Reset();
 	ShooterEncoder->Start();
-	
-	IndexSeenLastSample = false;
 	
 	PID = new PIDController(Config::GetSetting("cam_p", 0.04),
 								Config::GetSetting("cam_i", 0.005), 
@@ -35,25 +34,12 @@ CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB,
 								ShooterEncoder, 
 								cam_outputter);
 	PID->SetInputRange(0, 110);
-	PID->SetOutputRange(-1, 1);
-	PID->SetContinuous(true);
-	
-	/*PIDRight = new PIDController(Config::GetSetting("cam_p", 0.04),
-								Config::GetSetting("cam_i", 0.005), 
-								Config::GetSetting("cam_d", 0.03), 
-								ShooterEncoder, 
-								ShooterMotorRight);
-	PIDRight->SetInputRange(0, lines_per_rev);
-	PIDRight->SetOutputRange(-1, 1);
-	PIDRight->SetContinuous(true);
-	*/
-	//PIDRight->Enable();
-#if 1
-	PID->Enable();
-	m_state = CamShooter::Calibration;
-#else
-	m_state = CamShooter::Testing;
-#endif
+	PID->SetOutputRange(-1,1);
+	//PID->SetContinuous(true);
+	PID->SetTolerance(CAM_FIRE_POSITION_TOLERANCE);
+
+	//PID->Enable();
+	m_state = CamShooter::Homing;
 	
 	IndexHasBeenReset = false;
 	FireButtonLast = false;
@@ -70,18 +56,9 @@ void CamShooter::Reset()  {
 			Config::GetSetting("cam_i", 0.005),
 			Config::GetSetting("cam_d", 0.03)
 			);
-	//PIDRight->Reset();
-	//PIDRight->Disable();
-	/*PIDRight->SetPID(
-			Config::GetSetting("cam_p", 0.04),
-			Config::GetSetting("cam_i", 0.005),
-			Config::GetSetting("cam_d", 0.03)
-			);
-	*/
 }
 void CamShooter::PIDEnable() {
 	PID->Enable();
-	//PIDRight->Enable();
 }
 
 double CamShooter::GetPosition()
@@ -107,6 +84,9 @@ const char * CamShooter::StateNumberToString(int state)
 	case CamShooter::Calibration:
 		return "Calibration";
 		break;
+	case CamShooter::Homing:
+		return "Homing";
+		break;
 	default:
 		// ERROR
 		return "Unknown";
@@ -117,42 +97,21 @@ const char * CamShooter::StateNumberToString(int state)
 /**
  * @brief Peforms basic housekeeping logic outside of operator control.
  */
-void CamShooter::Process(bool fire)
+void CamShooter::Process(bool fire, bool rearm)
 {
-	bool IndexSeen = IndexTripped();
-	bool FireButton = fire;
-	float setpoint = PID->GetSetpoint();
-	
-	float cycle_period = Config::GetSetting("robot_loop_period", 0.05);
-	float rate = Config::GetSetting("robot_cam_rearm_rate", 30);
-	
-	float lines_forward = cycle_period * rate;
-	RA_DEBUG(lines_forward);
-
-	if (IndexSeen && !IndexSeenLastSample) {
-		ShooterEncoder->Reset();
-		setpoint = 0 + lines_forward;
-		IndexHasBeenReset = true;
-		std::cout << "Reset encoders because of index" << std::endl;
-	}
-	else {
-		IndexHasBeenReset = false;
-	}
 	switch (m_state) {
 	case CamShooter::Rearming:
-		if (::fabs(ShooterEncoder->GetDistance() - setpoint) <= CAM_SETPOINT_ERROR_LIMIT) {
-			setpoint += lines_forward;
-		}
-
-		if (::fabs(CAM_READY_TO_FIRE_POSITION - setpoint) < CAM_FIRE_POSITION_TOLERANCE) {
+		PID->SetSetpoint(CAM_READY_TO_FIRE_POSITION);
+		if (PID->OnTarget()) {
 			m_state = CamShooter::ReadyToFire;
 		}
 		
+		if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
+			m_state = CamShooter::Firing;
+		}
 		break;
 	case CamShooter::ReadyToFire:
-		setpoint = CAM_READY_TO_FIRE_POSITION;
-		
-		if (!FireButtonLast && FireButton) {
+		if (fire) {
 			m_state = CamShooter::Firing;
 		}
 		
@@ -162,21 +121,29 @@ void CamShooter::Process(bool fire)
 		}
 		break;
 	case CamShooter::Firing:
-		setpoint = CAM_FIRE_TO_POSITION;
+		PID->SetSetpoint(CAM_FIRE_TO_POSITION);
 		
-		if (ShooterEncoder->GetDistance() >= (CAM_FIRE_TO_POSITION - 1)) {
-			setpoint = ShooterEncoder->GetDistance(); // make sure we don't back-drive
+		if (PID->OnTarget() && rearm) {
+			m_state = CamShooter::Homing;
+		}
+		break;
+	case CamShooter::Homing:
+		// Switch to voltage mode, drive to the index.
+		PID->Disable();
+		cam_outputter->PIDWrite(Config::GetSetting("CAM_HOME_SPEED", .5));
+		
+		if (IndexTripped()) {
+			ShooterEncoder->Stop();
+			ShooterEncoder->Reset();
+			ShooterEncoder->Start();
+			
+			PID->Enable();
+			
 			m_state = CamShooter::Rearming;
 		}
 		break;
 	case CamShooter::Calibration:
-		if (::fabs(ShooterEncoder->GetDistance() - setpoint) <= CAM_SETPOINT_ERROR_LIMIT) {
-			setpoint += lines_forward;
-		}
-		if(IndexHasBeenReset){
-			m_state = CamShooter::Rearming;
-		}
-
+		// this isn't used anymore
 		break;
 	case CamShooter::Testing:
 		PID->Disable();
@@ -186,16 +153,10 @@ void CamShooter::Process(bool fire)
 		// ERROR
 		break;
 	}
-	RA_DEBUG(setpoint);
-	PID->SetSetpoint(setpoint);
-	////PIDRight->SetSetpoint(setpoint);
-	IndexSeenLastSample = IndexSeen;
-	FireButtonLast = FireButton;
 }
 void CamShooter::SetPosition(float pos)
 {
-	//PID->SetSetpoint(pos);
-	////PIDRight->SetSetpoint(pos);
+	
 }
 void CamShooter::logHeaders(ostream &f)
 {
@@ -212,8 +173,7 @@ void CamShooter::Debug(ostream &out)
 	out << "Encoder: "   << fixed << setprecision(2) << ShooterEncoder->GetDistance()
 		<< " Setpoint: " << fixed << setprecision(2) << PID->GetSetpoint() 
 		<< " Motor: "    << fixed << setprecision(2) << ShooterMotorLeft->Get() 
-		<< " Sensor: "   << (IndexTripped() ? "SEEN" : "")
-		
+		<< " Sensor: "   << (IndexTripped() ? "SEEN" : "")	
 		<< " State: " << CamShooter::StateNumberToString(m_state) << endl;
 	out.unsetf ( std::ios::fixed ); 
 }

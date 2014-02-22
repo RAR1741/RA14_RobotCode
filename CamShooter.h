@@ -39,7 +39,7 @@ public:
 	
 	//Functions
 	void PIDEnable(void);
-	void Process(bool fire);
+	void Process(bool fire, bool rearm);
 	double GetPosition();
 	void SetPosition(float pos);
 	void logHeaders(ostream &f);
@@ -49,7 +49,7 @@ public:
 	void Reset();
 private:
 	CamMotors * cam_outputter;
-	bool IndexTripped() { return !!IndexSensor->Get(); } 
+	bool IndexTripped() { return !!!IndexSensor->Get(); } 
 	Talon * ShooterMotorLeft;
 	Talon * ShooterMotorRight;
 	Encoder * ShooterEncoder;
@@ -65,6 +65,7 @@ private:
 		Rearming    = 3,        // Rearming
 		Calibration  = 4,
 		Testing     = 5,        // test mode. Doesn't try and do anything else
+		Homing      = 6,        // Either just fired, or on startup. Wait for index pulse.
 	} CamShooterState;
 	int m_state;
 	

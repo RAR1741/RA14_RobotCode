@@ -15,7 +15,7 @@
 #include "Collection.h"
 #include "Target.h"
 
-#define DISABLE_SHOOTER
+//#define DISABLE_SHOOTER
 
 using namespace std;
 
@@ -400,7 +400,7 @@ void RA14Robot::TeleopPeriodic()
 	//Fire Control
 	
 #ifndef DISABLE_SHOOTER
-	myCam->Process(ShouldFireButton);
+	myCam->Process(ShouldFireButton, DriverGamepad->GetX());
 	myCam->Debug(cout);
 #endif
 	
