@@ -1,5 +1,6 @@
 #include "WPIlib.h"
 #include "SpeedControlTalon.h"
+#include "Odometer.h"
 //#include "Config.h"
 #include <fstream>
 #ifndef DRIVE_H__
@@ -27,6 +28,9 @@ public:
 	void logHeaders(ostream &f);
 	void log(std::ostream &f);
 	
+	//return odometer object
+	Odometer* getOdometer();
+	
 	void Debug(std::ostream &f);
 private:
 
@@ -44,6 +48,9 @@ private:
 	
 	Encoder * LEncoder;
 	Encoder * REncoder;
+	
+	//Odometer
+	Odometer* odometer;
 
 	float DeadZone(float input);
 	

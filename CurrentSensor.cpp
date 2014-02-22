@@ -7,8 +7,9 @@ CurrentSensorSlot::CurrentSensorSlot(int channel)
 	toggle = 0;
 	count = 0;
 	total = 0.0;
-	kAmpsPerVolt = 50.0;
-	dig = new DigitalOutput(10);
+//	kAmpsPerVolt = 50.0;
+	kAmpsPerVolt = 25.0;
+	dig = new DigitalOutput(channel);
 	sample_queue = new std::queue<double>();
 }
 CurrentSensorSlot::CurrentSensorSlot(int module, int channel)
@@ -17,9 +18,9 @@ CurrentSensorSlot::CurrentSensorSlot(int module, int channel)
 	count = 0;
 	total = 0.0;
 	kAmpsPerVolt = 50.0;
-	dig = new DigitalOutput(10);
+	dig = new DigitalOutput(channel);
 	toggle = 0;
-	dig = new DigitalOutput(10);
+	//dig = new DigitalOutput(10);
 	
 	sample_queue = new std::queue<double>();
 }
@@ -34,12 +35,15 @@ CurrentSensorSlot::~CurrentSensorSlot()
 
 double CurrentSensorSlot::Get()
 {
-	if (sample_queue->size() == 0) return 0;
-	return total / sample_queue->size();
+	return (this->GetVoltage() - DCOffset) * kAmpsPerVolt;
+	
+//	if (sample_queue->size() == 0) return 0;
+//	return total / sample_queue->size();
 }
 
 void CurrentSensorSlot::Process()
 {
+	/*
 	double sample = (this->GetVoltage() - DCOffset) * kAmpsPerVolt;
 	
 	double old_value = sample_queue->front();
@@ -51,5 +55,6 @@ void CurrentSensorSlot::Process()
 		total -= old_value;
 		
 	}
+	*/
 }
 

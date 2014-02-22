@@ -23,6 +23,11 @@ DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int le
 	
 	ConfigureEncoder(LEncoder);
 	ConfigureEncoder(REncoder);
+	
+	//Odometer
+	odometer = new Odometer(leftencoder_a,leftencoder_b);
+	odometer->Reset(Odometer::lowGear);
+	
 }
 
 /*DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int leftsolreverse, int rightsolforward, int rightsolreverse,
@@ -65,12 +70,14 @@ void DriveTrain::Drive(double LeftStickY, double RightStickY)
 void DriveTrain::ShiftUp() //Shifts to the higher gear
 {
 	LeftSol->Set(DoubleSolenoid::kReverse);
+	odometer->ChangeRatio(Odometer::highGear);
 	//RightSol->Set(DoubleSolenoid::kReverse);
 	//cout<<"ShiftUp"<<endl;
 }
 void DriveTrain::ShiftDown() //Shifts to the lower gear
 {
 	LeftSol->Set(DoubleSolenoid::kForward);
+	odometer->ChangeRatio(Odometer::lowGear);
 	//RightSol->Set(DoubleSolenoid::kForward);
 	//cout<<"ShiftDown"<<endl;
 }
@@ -119,4 +126,8 @@ void DriveTrain::log(ostream &f)
 		f << sensors[i]->GetCurrent() << ",";
 	}
 	*/
+}
+Odometer* DriveTrain::getOdometer()
+{
+	return odometer;
 }

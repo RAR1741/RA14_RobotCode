@@ -16,6 +16,7 @@
 #include "Target.h"
 
 //#define DISABLE_SHOOTER
+#define DISABLE_AUTONOMOUS
 
 using namespace std;
 
@@ -49,6 +50,9 @@ private:
 	bool RingLightButtonRecentlyPressed;
 	bool alreadyInitialized;
 	
+	int auto_case;
+	int auto_timer;
+	
 	TargetServer * server;
 	Target * target;
 	CurrentSensorSlot * camMotor1Slot;
@@ -75,7 +79,8 @@ public:
 	myCamera = NULL;
 	myCollection = NULL;
 	DriverLeftY = 0.0;
-	DriverRightY = 0.0;  
+	DriverRightY = 0.0;
+	auto_case = 0;
 	DriverLeftBumper = true;
 	DriverRightBumper = true;
 	CurrentSensorReset = NULL;
@@ -223,11 +228,12 @@ void RA14Robot::DisabledInit() {
 	myCam->Reset();
 #endif
 
-	
+	/*
 	if(fout.is_open()) {
 		cout << "Closing logging.csv..." << endl;
 		fout.close();
 	}
+	*/
 }
 
 /**
@@ -238,7 +244,7 @@ void RA14Robot::DisabledInit() {
  */
 void RA14Robot::DisabledPeriodic() {
 	StartOfCycleMaintenance();
-	
+
 	EndOfCycleMaintenance();
 }
 
@@ -270,6 +276,42 @@ void RA14Robot::AutonomousInit() {
 void RA14Robot::AutonomousPeriodic() {
 	StartOfCycleMaintenance();
 	
+#ifndef DISABLE_AUTONOMOUS
+	target->Parse(server->GetLatestPacket());
+	
+	switch(auto_case)
+	{
+	case 0:
+		if( target->IsHot() && target->IsValid() )
+			{
+				//Drive forward and shoot right away
+				if( target->IsLeft() || target->IsRight() )
+				{
+					auto_case = 1;
+				}
+				else
+				{
+					cout<<"Error"<<endl;
+				}
+			}
+		else if(target->IsValid())
+		{
+			//Drive forward and wait to shoot
+			auto_case = 2;
+		}
+		else
+		{
+			//No target found
+			cout << "No target." << endl;
+		}
+	case 1:
+		
+	case 2:
+	default:
+		cout<<"Error in autonomous"<<endl;
+	}
+#endif
+	
 	EndOfCycleMaintenance();
 }
 
@@ -288,6 +330,7 @@ void RA14Robot::TeleopInit() {
 		fout.open("logging.csv");
 		logheaders();
 	}
+	
 #ifndef DISABLE_SHOOTER
 	myCam->PIDEnable();
 #endif
