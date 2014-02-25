@@ -56,6 +56,7 @@ void CamShooter::Reset()  {
 			Config::GetSetting("cam_i", 0.005),
 			Config::GetSetting("cam_d", 0.03)
 			);
+	m_state = CamShooter::Homing;
 }
 void CamShooter::PIDEnable() {
 	PID->Enable();
