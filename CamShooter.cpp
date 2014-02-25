@@ -22,8 +22,8 @@ CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB,
 	ShooterEncoder = new Encoder(encoderA, encoderB, false, Encoder::k4X);
 	IndexSensor = new DigitalInput(indexInput);
 	
-	//ShooterEncoder->SetDistancePerPulse(100.0 / (gear_reduction_ratio * lines_per_rev) );
-	ShooterEncoder->SetDistancePerPulse(1);
+	ShooterEncoder->SetDistancePerPulse(100.0 / (gear_reduction_ratio * lines_per_rev) );
+	//ShooterEncoder->SetDistancePerPulse(1);
 	ShooterEncoder->SetPIDSourceParameter(Encoder::kDistance);
 	ShooterEncoder->Reset();
 	ShooterEncoder->Start();
@@ -160,12 +160,12 @@ void CamShooter::SetPosition(float pos)
 }
 void CamShooter::logHeaders(ostream &f)
 {
-	f << "ShooterMotorLeftPositionSetpoint,ShooterMotorPositionActual,ShooterMotorLeftDemand,CamIndex,ShooterState";
+	f << "ShooterMotorLeftPositionSetpoint,ShooterMotorPositionActual,ShooterMotorLeftDemand,CamIndex,ShooterState,";
 }
 void CamShooter::log(ostream &f)
 {
 	f << PID->GetSetpoint() << "," << ShooterEncoder->GetDistance() << "," << ShooterMotorLeft->Get() << "," << IndexTripped() << ",";
-	f << m_state;
+	f << m_state << ",";
 }
 
 void CamShooter::Debug(ostream &out) 

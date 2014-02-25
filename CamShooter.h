@@ -49,7 +49,7 @@ public:
 	void Reset();
 private:
 	CamMotors * cam_outputter;
-	bool IndexTripped() { return !!!IndexSensor->Get(); } 
+	bool IndexTripped() { return !!IndexSensor->Get(); } 
 	Talon * ShooterMotorLeft;
 	Talon * ShooterMotorRight;
 	Encoder * ShooterEncoder;
