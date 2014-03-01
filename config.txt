@@ -5,7 +5,7 @@ cam_i = .0015
 cam_d = .1
 
 # Robot Loop period
-robot_loop_period = .05
+robot_loop_period = .02
 
 # CAM
 robot_cam_rearm_rate = 25

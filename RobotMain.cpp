@@ -63,6 +63,9 @@ private:
 	
 	DigitalInput * currentSensor1Reset;
 	
+	DigitalOutput * signalOutCycle;
+	DigitalOutput * signalOutToggle;
+	
 	Timer * missionTimer;
 	
 public:
@@ -102,6 +105,9 @@ public:
 		
 	currentSensor1Reset = NULL;
 	resetCurrentSensorTimer = NULL;
+	
+	signalOutCycle = NULL;
+	signalOutToggle = NULL;
   }
   
 /**
@@ -181,11 +187,20 @@ void RA14Robot::RobotInit() {
 	cout << "Mission Timer starting:" << endl;
 	missionTimer = new Timer();
 	cout << "Mission timer started: " << missionTimer->Get() << "s" << endl;
+	
+	cout << "Signaling system starting..." << endl;
+	signalOutToggle = new DigitalOutput(13);
+	signalOutCycle = new DigitalOutput(14);
+	cout << "Signal system started." << endl;
 	cout << "Robot Init Complete..." << endl;
 }
 
 void RA14Robot::StartOfCycleMaintenance()
 {
+	static bool toggleOut = false;
+	signalOutCycle->Set(1);
+	toggleOut = ! toggleOut;
+	signalOutToggle->Set( toggleOut );
 	CurrentSensorSlot * slots[4] = { 
 	camMotor1Slot,
 	camMotor2Slot,
@@ -195,6 +210,8 @@ void RA14Robot::StartOfCycleMaintenance()
 	for (int i = 0; i < 4; ++i) {
 		slots[i]->Process();
 	}
+	
+	
 }
 
 void RA14Robot::EndOfCycleMaintenance()
@@ -206,7 +223,8 @@ void RA14Robot::EndOfCycleMaintenance()
 		CurrentSensorReset->Set(1);
 		resetCurrentSensorTimer->Reset();
 		CurrentSensorReset->Set(0);
-	}	
+	}
+	signalOutCycle->Set(0);
 }
 
 /**
