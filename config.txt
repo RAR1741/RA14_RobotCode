@@ -9,12 +9,14 @@ robot_loop_period = .05
 
 # CAM
 robot_cam_rearm_rate = 25
-cam_ready_to_fire_position = 52.75
-cam_fire_to_position = 61
-cam_point_of_no_return = 58
+cam_ready_to_fire_position = 54
+cam_fire_to_position = 63
+cam_point_of_no_return = 60
 cam_fire_position_tolerance = 1
 cam_setpoint_error_limit = 25
 cam_home_speed = .5
+cam_home_speed_slow = .25
+cam_home_speed_cutoff = 50
 
 #Odometer stuff
 drive_train_gear_ratio_low = 0

@@ -102,24 +102,32 @@ void CamShooter::Process(bool fire, bool rearm)
 {
 	switch (m_state) {
 	case CamShooter::Rearming:
-		PID->SetSetpoint(CAM_READY_TO_FIRE_POSITION);
-		if (PID->OnTarget()) {
+		float speed =  Config::GetSetting("cam_home_speed", .5);
+		cam_outputter->PIDWrite(speed);
+		//PID->SetSetpoint(CAM_READY_TO_FIRE_POSITION);
+		//if (PID->OnTarget()) {
+		if (CAM_READY_TO_FIRE_POSITION - ShooterEncoder->GetDistance() <= CAM_FIRE_POSITION_TOLERANCE) {
+			cam_outputter->PIDWrite(0);
+			PID->SetSetpoint(CAM_READY_TO_FIRE_POSITION);
+			PID->Reset();
+			PID->Enable();
 			m_state = CamShooter::ReadyToFire;
 		}
-		
-		/*if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
-			m_state = CamShooter::Firing;
-		}*/
+		if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
+					m_state = CamShooter::Firing;
+				}
 		break;
 	case CamShooter::ReadyToFire:
 		if (fire) {
 			m_state = CamShooter::Firing;
+			PID->Reset();
+			PID->Enable();
 		}
 		
-		/*if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
+		if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
 			m_state = CamShooter::Firing;
 			cout << "OK, I guess we're firing now. Fine. Whatever." << endl;
-		}*/
+		}
 		break;
 	case CamShooter::Firing:
 		PID->SetSetpoint(CAM_FIRE_TO_POSITION);
@@ -138,7 +146,7 @@ void CamShooter::Process(bool fire, bool rearm)
 			ShooterEncoder->Reset();
 			ShooterEncoder->Start();
 			
-			PID->Enable();
+			//PID->Enable();
 			
 			m_state = CamShooter::Rearming;
 		}
@@ -171,12 +179,11 @@ void CamShooter::log(ostream &f)
 
 void CamShooter::Debug(ostream &out) 
 {
-	out << "Encoder: "   << fixed << setprecision(2) << ShooterEncoder->GetDistance()
-		<< " Setpoint: " << fixed << setprecision(2) << PID->GetSetpoint() 
-		<< " Motor: "    << fixed << setprecision(2) << ShooterMotorLeft->Get() 
+	out << "Encoder: "   <<  ShooterEncoder->GetDistance()
+		<< " Setpoint: " << PID->GetSetpoint() 
+		<< " Motor: "    << ShooterMotorLeft->Get() 
 		<< " Sensor: "   << (IndexTripped() ? "SEEN" : "")	
 		<< " State: " << CamShooter::StateNumberToString(m_state) << endl;
-	out.unsetf ( std::ios::fixed ); 
 }
 
 
