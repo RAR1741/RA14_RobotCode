@@ -107,19 +107,19 @@ void CamShooter::Process(bool fire, bool rearm)
 			m_state = CamShooter::ReadyToFire;
 		}
 		
-		if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
+		/*if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
 			m_state = CamShooter::Firing;
-		}
+		}*/
 		break;
 	case CamShooter::ReadyToFire:
 		if (fire) {
 			m_state = CamShooter::Firing;
 		}
 		
-		if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
+		/*if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
 			m_state = CamShooter::Firing;
 			cout << "OK, I guess we're firing now. Fine. Whatever." << endl;
-		}
+		}*/
 		break;
 	case CamShooter::Firing:
 		PID->SetSetpoint(CAM_FIRE_TO_POSITION);
