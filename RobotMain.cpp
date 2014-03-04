@@ -15,8 +15,8 @@
 #include "Collection.h"
 #include "Target.h"
 
-//#define DISABLE_SHOOTER
-#define DISABLE_AUTONOMOUS
+#define DISABLE_SHOOTER
+//#define DISABLE_AUTONOMOUS
 
 using namespace std;
 
@@ -34,6 +34,7 @@ private:
 	Gamepad * OperatorGamepad;
 	Compressor * myCompressor;
 	Collection * myCollection;
+	Odometer * myOdometer;
 	float DriverLeftY;
 	float DriverRightY;
 	bool DriverLeftBumper;
@@ -94,6 +95,7 @@ public:
 	ShouldFireButton = false;
 	BallCollectPickupButton = false;
 	DriverDPad = Gamepad::kCenter;
+	myOdometer = NULL;
 	
 	server = NULL;
 	target = NULL;
@@ -177,6 +179,11 @@ void RA14Robot::RobotInit() {
 	//camMotor1Slot = new CurrentSensorSlot()
 	cout << "Current sensor set up" << endl;
 	
+	cout << "Setting up Odometer" << endl;
+	myOdometer = new Odometer(4,5);
+	auto_case = (int)Config::GetSetting("auto_case", 1);
+	cout << "Current sensor set up" << endl;
+	
 	this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
 	cout << "Period set to " << this->GetLoopsPerSec() << "Hz" << endl;
 	
@@ -193,6 +200,8 @@ void RA14Robot::RobotInit() {
 	signalOutCycle = new DigitalOutput(14);
 	cout << "Signal system started." << endl;
 	cout << "Robot Init Complete..." << endl;
+	
+	Config::Dump();
 }
 
 void RA14Robot::StartOfCycleMaintenance()
@@ -306,6 +315,16 @@ void RA14Robot::AutonomousPeriodic() {
 				if( target->IsLeft() || target->IsRight() )
 				{
 					auto_case = 1;
+					if(myOdometer->getDistance() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+					{
+						myDrive->Drive(.1,.1);
+					}
+					else
+					{
+						#ifndef DISABLE_SHOOTER
+							myCam->Process(1,0);
+						#endif
+					}
 				}
 				else
 				{
@@ -316,15 +335,23 @@ void RA14Robot::AutonomousPeriodic() {
 		{
 			//Drive forward and wait to shoot
 			auto_case = 2;
+			if(myOdometer->getDistance() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+				myDrive->Drive(.1,.1);
+			else
+			{
+				if( target->IsHot() )
+				{
+					#ifndef DISABLE_SHOOTER
+					myCam->Process(1,0);
+					#endif
+				}
+			}
 		}
 		else
 		{
-			//No target found
-			cout << "No target." << endl;
+			//Not valid
+			cout << "Not valid target." << endl;
 		}
-	case 1:
-		
-	case 2:
 	default:
 		cout<<"Error in autonomous"<<endl;
 	}
@@ -421,25 +448,25 @@ void RA14Robot::TeleopPeriodic()
 		armPosition = 0;
 		rollerPosition = 0;
 		break;
-	case Gamepad::kDown:
+	case Gamepad::kUp:
 		armPosition = -1;
 		break;
-	case Gamepad::kDownLeft:
+	case Gamepad::kUpLeft:
 		armPosition = -1;
 		rollerPosition = -1; 
 		break;
-	case Gamepad::kDownRight:
+	case Gamepad::kUpRight:
 		armPosition = -1;
 		rollerPosition = 1;
 		break;
-	case Gamepad::kUp:
+	case Gamepad::kDown:
 		armPosition = 1;
 		break;
-	case Gamepad::kUpLeft:
+	case Gamepad::kDownLeft:
 		armPosition = 1;
 		rollerPosition = -1;
 		break;
-	case Gamepad::kUpRight:
+	case Gamepad::kDownRight:
 		armPosition = 1;
 		rollerPosition = 1;
 		break;
@@ -449,6 +476,11 @@ void RA14Robot::TeleopPeriodic()
 	case Gamepad::kRight:
 		rollerPosition = 1;
 		break;
+	}
+	
+	if(DriverGamepad->GetLeftTrigger())
+	{
+		rollerPosition = -1;
 	}
 	
 	spinSpeed *= rollerPosition;

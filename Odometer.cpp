@@ -1,5 +1,6 @@
 #include "Odometer.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -8,30 +9,12 @@ Odometer::Odometer(int channelA, int channelB)
 	encoder = new Encoder(channelA,channelB,false,Encoder::k4X);
 	encoder->Start();
 }
-void Odometer::Reset(GearRatio ratio)
+void Odometer::Reset()
 {
 	encoder->Stop();
-	if(ratio == Odometer::highGear)
-	{
-		encoder->SetDistancePerPulse(DRIVE_TRAIN_GEAR_RATIO_HIGH);
-	}
-	else if(ratio == Odometer::lowGear)
-	{
-		encoder->SetDistancePerPulse(DRIVE_TRAIN_GEAR_RATIO_LOW);
-	}
+	encoder->SetDistancePerPulse( ( (4 * atan(1) ) * 4) / 250 );
 	encoder->Reset();
 	encoder->Start();
-}
-void Odometer::ChangeRatio(GearRatio ratio)
-{
-	if(ratio == Odometer::highGear)
-	{
-		encoder->SetDistancePerPulse(DRIVE_TRAIN_GEAR_RATIO_HIGH);
-	}
-	else if(ratio == Odometer::lowGear)
-	{
-		encoder->SetDistancePerPulse(DRIVE_TRAIN_GEAR_RATIO_LOW);
-	}
 }
 double Odometer::getDistance()
 {

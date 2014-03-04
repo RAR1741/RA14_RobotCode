@@ -26,7 +26,7 @@ DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int le
 	
 	//Odometer
 	odometer = new Odometer(leftencoder_a,leftencoder_b);
-	odometer->Reset(Odometer::lowGear);
+	odometer->Reset();
 	
 }
 
@@ -70,14 +70,12 @@ void DriveTrain::Drive(double LeftStickY, double RightStickY)
 void DriveTrain::ShiftUp() //Shifts to the higher gear
 {
 	LeftSol->Set(DoubleSolenoid::kReverse);
-	odometer->ChangeRatio(Odometer::highGear);
 	//RightSol->Set(DoubleSolenoid::kReverse);
 	//cout<<"ShiftUp"<<endl;
 }
 void DriveTrain::ShiftDown() //Shifts to the lower gear
 {
 	LeftSol->Set(DoubleSolenoid::kForward);
-	odometer->ChangeRatio(Odometer::lowGear);
 	//RightSol->Set(DoubleSolenoid::kForward);
 	//cout<<"ShiftDown"<<endl;
 }
