@@ -321,6 +321,7 @@ void RA14Robot::AutonomousPeriodic() {
 					}
 					else
 					{
+						myDrive->Drive(0,0);
 						#ifndef DISABLE_SHOOTER
 							myCam->Process(1,0);
 						#endif
@@ -336,9 +337,13 @@ void RA14Robot::AutonomousPeriodic() {
 			//Drive forward and wait to shoot
 			auto_case = 2;
 			if(myOdometer->getDistance() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+			{
 				myDrive->Drive(.1,.1);
+			}
 			else
 			{
+				// now at the firing spot.
+				myDrive->Drive(0,0);
 				if( target->IsHot() )
 				{
 					#ifndef DISABLE_SHOOTER
@@ -567,7 +572,7 @@ void RA14Robot::logheaders()
 	myCam->logHeaders(fout);
 #endif
 	myDrive->logHeaders(fout);
-	fout << "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,";
+	fout << "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,";
 	fout << endl;
 }
 
@@ -587,6 +592,8 @@ void RA14Robot::logging()
 	for (int i = 0; i < 4; ++i) {
 		fout << slots[i]->Get() << ",";
 	}
+	
+	fout << auto_case << ",";
 	fout << endl;
 }
 
