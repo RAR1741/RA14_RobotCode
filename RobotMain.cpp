@@ -504,7 +504,7 @@ void RA14Robot::TeleopPeriodic()
 	//Fire Control
 	
 #ifndef DISABLE_SHOOTER
-	myCam->Process(ShouldFireButton, DriverGamepad->GetX());
+	myCam->Process(ShouldFireButton, DriverGamepad->GetX(), DriverGamepad->GetY());
 	myCam->Debug(cout);
 #endif
 	

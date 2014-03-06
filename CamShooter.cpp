@@ -88,6 +88,9 @@ const char * CamShooter::StateNumberToString(int state)
 	case CamShooter::Homing:
 		return "Homing";
 		break;
+	case CamShooter::Ejecting:
+		return "Ejecting";
+		break;
 	default:
 		// ERROR
 		return "Unknown";
@@ -98,7 +101,7 @@ const char * CamShooter::StateNumberToString(int state)
 /**
  * @brief Peforms basic housekeeping logic outside of operator control.
  */
-void CamShooter::Process(bool fire, bool rearm)
+void CamShooter::Process(bool fire, bool rearm, bool eject)
 {
 	switch (m_state) {
 	case CamShooter::Rearming:
@@ -127,6 +130,8 @@ void CamShooter::Process(bool fire, bool rearm)
 		if (ShooterEncoder->GetDistance() >= CAM_POINT_OF_NO_RETURN) {
 			m_state = CamShooter::Firing;
 			cout << "OK, I guess we're firing now. Fine. Whatever." << endl;
+		} else if (eject) {
+			m_state = CamShooter::Ejecting;
 		}
 		break;
 	case CamShooter::Firing:
@@ -153,6 +158,13 @@ void CamShooter::Process(bool fire, bool rearm)
 		break;
 	case CamShooter::Calibration:
 		// this isn't used anymore
+		break;
+	case CamShooter::Ejecting:
+		PID->SetSetpoint(Config::GetSetting("CAM_EJECT_POSITION", 30));
+
+		if (!eject) {
+			m_state = CamShooter::Rearming;
+		}
 		break;
 	case CamShooter::Testing:
 		PID->Disable();

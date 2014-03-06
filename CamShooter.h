@@ -39,7 +39,7 @@ public:
 	
 	//Functions
 	void PIDEnable(void);
-	void Process(bool fire, bool rearm);
+	void Process(bool fire, bool rearm, bool eject = false);
 	double GetPosition();
 	void SetPosition(float pos);
 	void logHeaders(ostream &f);
@@ -66,6 +66,7 @@ private:
 		Calibration  = 4,
 		Testing     = 5,        // test mode. Doesn't try and do anything else
 		Homing      = 6,        // Either just fired, or on startup. Wait for index pulse.
+		Ejecting    = 7,        // Ejecting the ball
 	} CamShooterState;
 	int m_state;
 	
