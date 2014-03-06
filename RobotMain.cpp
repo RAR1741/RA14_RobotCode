@@ -599,7 +599,7 @@ void RA14Robot::logging()
 		fout << slots[i]->Get() << ",";
 	}
 	
-	fout << auto_case << "," << /* gyro->GetAngle() << ","; */
+	fout << auto_case << "," << gyro->GetAngle() << ","; 
 	fout << endl;
 }
 
