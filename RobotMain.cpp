@@ -15,7 +15,7 @@
 #include "Collection.h"
 #include "Target.h"
 
-#define DISABLE_SHOOTER
+//#define DISABLE_SHOOTER
 //#define DISABLE_AUTONOMOUS
 
 using namespace std;
@@ -187,7 +187,7 @@ void RA14Robot::RobotInit() {
 	myOdometer = new Odometer(4,5);
 	auto_case = (int)Config::GetSetting("auto_case", 1);
 	cout << "Setting up Gyro, please do NOT move the robot..." << endl;
-	gyro = new Gyro(5, 6);
+	gyro = new Gyro(5);
 	cout << "Gyro initialized." << endl;
 	
 	this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
@@ -599,7 +599,7 @@ void RA14Robot::logging()
 		fout << slots[i]->Get() << ",";
 	}
 	
-	fout << auto_case << "," << gyro->GetAngle() << ",";
+	fout << auto_case << "," << /* gyro->GetAngle() << ","; */
 	fout << endl;
 }
 
