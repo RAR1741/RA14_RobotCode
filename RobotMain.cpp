@@ -69,6 +69,8 @@ private:
 	
 	Timer * missionTimer;
 	
+	Gyro * gyro;
+	
 public:
   RA14Robot()
   {
@@ -110,6 +112,8 @@ public:
 	
 	signalOutCycle = NULL;
 	signalOutToggle = NULL;
+	
+	gyro = NULL;
   }
   
 /**
@@ -182,7 +186,9 @@ void RA14Robot::RobotInit() {
 	cout << "Setting up Odometer" << endl;
 	myOdometer = new Odometer(4,5);
 	auto_case = (int)Config::GetSetting("auto_case", 1);
-	cout << "Current sensor set up" << endl;
+	cout << "Setting up Gyro, please do NOT move the robot..." << endl;
+	gyro = new Gyro(5, 6);
+	cout << "Gyro initialized." << endl;
 	
 	this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
 	cout << "Period set to " << this->GetLoopsPerSec() << "Hz" << endl;
@@ -572,7 +578,7 @@ void RA14Robot::logheaders()
 	myCam->logHeaders(fout);
 #endif
 	myDrive->logHeaders(fout);
-	fout << "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,";
+	fout << "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading";
 	fout << endl;
 }
 
@@ -593,7 +599,7 @@ void RA14Robot::logging()
 		fout << slots[i]->Get() << ",";
 	}
 	
-	fout << auto_case << ",";
+	fout << auto_case << "," << gyro->GetAngle() << ",";
 	fout << endl;
 }
 
