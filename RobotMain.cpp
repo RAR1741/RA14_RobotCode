@@ -504,7 +504,7 @@ void RA14Robot::TeleopPeriodic()
 	//Fire Control
 	
 #ifndef DISABLE_SHOOTER
-	myCam->Process(ShouldFireButton, DriverGamepad->GetX(), DriverGamepad->GetY());
+	myCam->Process(ShouldFireButton, DriverGamepad->GetX(), DriverGamepad->GetB());
 	myCam->Debug(cout);
 #endif
 	
@@ -599,7 +599,7 @@ void RA14Robot::logging()
 		fout << slots[i]->Get() << ",";
 	}
 	
-	fout << auto_case << "," << gyro->GetAngle() << ","; 
+	fout << auto_case << "," << 0 << ","; 
 	fout << endl;
 }
 
