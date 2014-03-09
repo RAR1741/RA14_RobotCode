@@ -29,8 +29,8 @@ CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB,
 	ScopeToggle = new DigitalOutput(scopeTogglePort);
 	ScopeCycle = new DigitalOutput(scopeCyclePort);
 	
-	//ShooterEncoder->SetDistancePerPulse(100.0 / (gear_reduction_ratio * lines_per_rev) );
-	ShooterEncoder->SetDistancePerPulse(1);
+	ShooterEncoder->SetDistancePerPulse(100.0 / (gear_reduction_ratio * lines_per_rev) );
+	//ShooterEncoder->SetDistancePerPulse(1);
 	ShooterEncoder->SetPIDSourceParameter(Encoder::kDistance);
 	ShooterEncoder->Reset();
 	ShooterEncoder->Start();
@@ -46,6 +46,7 @@ CamShooter::CamShooter(int motorLeft,int motorRight, int encoderA, int encoderB,
 			  Config::GetSetting("cam_i", 0.005),
 			  Config::GetSetting("cam_d", 0.03)
 			);
+	m_setpoint = 0;
 	DisablePID();
 	m_minimumInput = 0;
 	m_maximumInput = 100 + 10; // 10 is the headroom if the homing is WAY off
@@ -197,7 +198,10 @@ void CamShooter::Reset()  {
 			Config::GetSetting("cam_i", 0.005),
 			Config::GetSetting("cam_d", 0.03)
 			);
-	m_state = CamShooter::Homing;
+		m_state = CamShooter::Homing;
+		ShooterEncoder->Reset();
+		ShooterEncoder->Start();
+		DisablePID();
 	}
 	END_REGION;
 }

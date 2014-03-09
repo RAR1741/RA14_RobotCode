@@ -202,8 +202,8 @@ void RA14Robot::RobotInit() {
 	cout << "Mission timer started: " << missionTimer->Get() << "s" << endl;
 	
 	cout << "Signaling system starting..." << endl;
-	signalOutToggle = new DigitalOutput(13);
-	signalOutCycle = new DigitalOutput(14);
+	//signalOutToggle = new DigitalOutput(13);
+	//signalOutCycle = new DigitalOutput(14);
 	cout << "Signal system started." << endl;
 	cout << "Robot Init Complete..." << endl;
 	
@@ -213,9 +213,9 @@ void RA14Robot::RobotInit() {
 void RA14Robot::StartOfCycleMaintenance()
 {
 	static bool toggleOut = false;
-	signalOutCycle->Set(1);
+	//signalOutCycle->Set(1);
 	toggleOut = ! toggleOut;
-	signalOutToggle->Set( toggleOut );
+	//signalOutToggle->Set( toggleOut );
 	CurrentSensorSlot * slots[4] = { 
 	camMotor1Slot,
 	camMotor2Slot,
@@ -239,7 +239,7 @@ void RA14Robot::EndOfCycleMaintenance()
 		resetCurrentSensorTimer->Reset();
 		CurrentSensorReset->Set(0);
 	}
-	signalOutCycle->Set(0);
+	//signalOutCycle->Set(0);
 }
 
 /**
@@ -296,7 +296,8 @@ void RA14Robot::AutonomousInit() {
 		logheaders();
 	}
 #ifndef DISABLE_SHOOTER
-	myCam->PIDEnable();
+	myCam->Reset();
+	myCam->Enable();
 #endif
 }
 
@@ -388,7 +389,8 @@ void RA14Robot::TeleopInit() {
 	}
 	
 #ifndef DISABLE_SHOOTER
-	myCam->PIDEnable();
+	myCam->Reset();
+	myCam->Enable();
 #endif
 }
 
@@ -556,6 +558,8 @@ void RA14Robot::TeleopPeriodic()
  */
 void RA14Robot::TestInit() {
 	myCompressor->Start();
+	Config::LoadFromFile("config.txt");
+	Config::Dump();
 }
 
 /**
