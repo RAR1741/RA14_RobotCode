@@ -138,7 +138,7 @@ void RA14Robot::RobotInit() {
 	
 	cout << "Initializing cam shooter..." << endl;
 #ifndef DISABLE_SHOOTER
-	myCam = new CamShooter(5, 6, 2, 1, 3);
+	myCam = new CamShooter(5, 6, 2, 1, 3, 13, 14, Config::GetSetting("cam_loop_period", .004));
 #else
 	cout << "Cam shooter DISABLED!" << endl;
 #endif

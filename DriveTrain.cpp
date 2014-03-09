@@ -16,7 +16,6 @@ DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int le
 	RLMotor = new Talon(rl);
 	RRMotor = new Talon(rr);
 	LeftSol = new DoubleSolenoid(leftsolforward,leftsolreverse);
-	//RightSol = new DoubleSolenoid(rightsolforward,rightsolreverse);
 	
 	LEncoder = new Encoder(leftencoder_a, leftencoder_b );
 	REncoder = new Encoder(rightencoder_a, rightencoder_b);
@@ -29,17 +28,6 @@ DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int le
 	odometer->Reset();
 	
 }
-
-/*DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int leftsolreverse, int rightsolforward, int rightsolreverse,
-		int leftencoder_a, int leftencoder_b, int rightencoder_a, int rightencoder_b)
-{
-	SpeedControlFLMotor = new SpeedControlTalon(fl,leftencoder_a,leftencoder_b);
-	SpeedControlFRMotor = new SpeedControlTalon(fr,rightencoder_a,rightencoder_b);
-	SpeedControlRLMotor = new SpeedControlTalon(rl,leftencoder_a,leftencoder_b);
-	SpeedControlRRMotor = new SpeedControlTalon(rr,rightencoder_a,rightencoder_b);
-	LeftSol = new DoubleSolenoid(leftsolforward,leftsolreverse);
-	RightSol = new DoubleSolenoid(rightsolforward,rightsolreverse);
-}*/
 
 DriveTrain::~DriveTrain()
 {

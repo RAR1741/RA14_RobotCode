@@ -8,6 +8,7 @@ cam_d = .1
 robot_loop_period = .02
 
 # CAM
+cam_loop_period = 0.004
 robot_cam_rearm_rate = 25
 cam_ready_to_fire_position = 54
 cam_fire_to_position = 63
