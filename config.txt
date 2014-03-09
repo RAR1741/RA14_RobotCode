@@ -10,9 +10,9 @@ robot_loop_period = .02
 # CAM
 cam_loop_period = 0.004
 robot_cam_rearm_rate = 25
-cam_ready_to_fire_position = 52.5
+cam_ready_to_fire_position = 53
 cam_fire_to_position = 63
-cam_point_of_no_return = 54
+cam_point_of_no_return = 56
 cam_fire_position_tolerance = 1
 cam_setpoint_error_limit = 25
 cam_home_speed = .6
