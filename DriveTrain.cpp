@@ -114,7 +114,9 @@ void DriveTrain::log(ostream &f)
 	}
 	*/
 }
+/*
 Odometer* DriveTrain::getOdometer()
 {
 	return odometer;
 }
+*/

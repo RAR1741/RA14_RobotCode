@@ -31,7 +31,7 @@ public:
 	void log(std::ostream &f);
 	
 	//return odometer object
-	Odometer* getOdometer();
+	//Odometer* getOdometer();
 	
 	void Debug(std::ostream &f);
 private:

@@ -17,7 +17,7 @@
 #include "Target.h"
 
 #define DISABLE_SHOOTER
-#define DISABLE_AUTONOMOUS
+//#define DISABLE_AUTONOMOUS
 
 using namespace std;
 
@@ -308,49 +308,42 @@ public:
 		StartOfCycleMaintenance();
 
 		target->Parse(server->GetLatestPacket());
-
-		if (myDrive->GetOdometer() <= (4 * acos(-1) ) ) //216 is distance from robot to goal
-		{
-			float speed = Config::GetSetting("auto_speed", .3);
-			cout << myDrive->GetOdometer() << endl;
-			myDrive->Drive(speed, speed);
-		} else {
-			cout << "Finished driving";
-			myDrive->Drive(0, 0);
-		}
-
+		float speed = Config::GetSetting("auto_speed", .3);
 #ifndef DISABLE_AUTONOMOUS
 		switch(auto_case)
 		{
 			case 1:
 			if( target->IsHot() && target->IsValid() )
 			{
+				cout << "Target is HOTTT taking the shot" << endl;
 				//Drive forward and shoot right away
-				if( target->IsLeft() || target->IsRight() )
-				{
-					if(myOdometer->getDistance() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+				//if( target->IsLeft() || target->IsRight() )
+				//{
+					if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
 					{
-						myDrive->Drive(-.1,-.1);
+						myDrive->Drive(speed,speed);
 					}
 					else
 					{
 						myDrive->Drive(0,0);
+						cout << "FIRING" << endl;
 #ifndef DISABLE_SHOOTER
 						myCam->Process(1,0);
 #endif
 					}
-				}
+				/*}
 				else
 				{
 					cout<<"Error"<<endl;
-				}
+				}*/
 			}
 			else if(target->IsValid())
 			{
-				//Drive forward and wait to shoot
-				if(myOdometer->getDistance() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+				cout << "Target is valid, but cold. Driving and waiting" << endl;
+				//Drive forward and wait to shoot 
+				if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
 				{
-					myDrive->Drive(-.1,-.1);
+					myDrive->Drive(speed, speed);
 				}
 				else
 				{
@@ -358,6 +351,7 @@ public:
 					myDrive->Drive(0,0);
 					if( target->IsHot() )
 					{
+						cout << "FIRING" << endl;
 #ifndef DISABLE_SHOOTER
 						myCam->Process(1,0);
 #endif
@@ -373,6 +367,16 @@ public:
 			default:
 			cout<<auto_case<<endl;
 			cout<<"Error in autonomous"<<endl;
+		}
+#else
+		if (myDrive->GetOdometer() <= (4 * acos(-1) ) ) //216 is distance from robot to goal
+		{
+			float speed = Config::GetSetting("auto_speed", .3);
+			cout << myDrive->GetOdometer() << endl;
+			myDrive->Drive(speed, speed);
+		} else {
+			cout << "Finished driving";
+			myDrive->Drive(0, 0);
 		}
 #endif
 
