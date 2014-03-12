@@ -24,8 +24,9 @@ DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int le
 	ConfigureEncoder(REncoder);
 	
 	//Odometer
+	/*
 	odometer = new Odometer(leftencoder_a,leftencoder_b);
-	odometer->Reset();
+	odometer->Reset(); */
 	
 }
 

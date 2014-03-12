@@ -22,6 +22,8 @@ public:
 	~DriveTrain();
 	
 	//Drive functions
+	float GetOdometer() { return REncoder->GetDistance(); }
+	void ResetOdometer() { LEncoder->Reset(); REncoder->Reset(); }
 	void Drive(double LeftStickY, double RightStickY);
 	void ShiftUp();
 	void ShiftDown();

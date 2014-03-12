@@ -34,7 +34,7 @@ private:
 	Gamepad * OperatorGamepad;
 	Compressor * myCompressor;
 	Collection * myCollection;
-	Odometer * myOdometer;
+	//Odometer * myOdometer;
 	float DriverLeftY;
 	float DriverRightY;
 	bool DriverLeftBumper;
@@ -96,7 +96,7 @@ public:
 		ShouldFireButton = false;
 		BallCollectPickupButton = false;
 		DriverDPad = Gamepad::kCenter;
-		myOdometer = NULL;
+		//myOdometer = NULL;
 
 		server = NULL;
 		target = NULL;
@@ -183,7 +183,7 @@ public:
 		cout << "Current sensor set up" << endl;
 
 		cout << "Setting up Odometer" << endl;
-		myOdometer = new Odometer(4, 5);
+		//myOdometer = new Odometer(4, 5);
 		auto_case = (int) Config::GetSetting("auto_case", 1);
 		cout << "Setting up Gyro, please do NOT move the robot..." << endl;
 		gyro = new Gyro(5);
@@ -284,7 +284,8 @@ public:
 	void RA14Robot::AutonomousInit() {
 		alreadyInitialized = true;
 		missionTimer->Start();
-		myOdometer->Reset();
+		myDrive->ResetOdometer();
+		//myOdometer->Reset();
 		myDrive->ShiftDown();
 		if (!fout.is_open()) {
 			cout << "Opening logging.csv..." << endl;
@@ -308,10 +309,11 @@ public:
 
 		target->Parse(server->GetLatestPacket());
 
-		if (myOdometer->getDistance() <= (4 * acos(-1) ) ) //216 is distance from robot to goal
+		if (myDrive->GetOdometer() <= (4 * acos(-1) ) ) //216 is distance from robot to goal
 		{
-			cout << myOdometer->getDistance() << endl;
-			myDrive->Drive(-.1, -.1);
+			float speed = Config::GetSetting("auto_speed", .3);
+			cout << myDrive->GetOdometer() << endl;
+			myDrive->Drive(speed, speed);
 		} else {
 			cout << "Finished driving";
 			myDrive->Drive(0, 0);
@@ -387,7 +389,8 @@ public:
 		myCompressor->Start();
 		alreadyInitialized = true;
 		missionTimer->Start();
-		myOdometer->Reset();
+		myDrive->ResetOdometer();
+		//myOdometer->Reset();
 		if (!fout.is_open()) {
 			cout << "Opening logging.csv..." << endl;
 			fout.open("logging.csv");

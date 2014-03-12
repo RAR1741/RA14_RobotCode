@@ -22,7 +22,7 @@ cam_eject_position = 30
 
 #Odometer stuff
 auto_firing_distance = 96 #Distance from the goal that robot will be shooting from in inches
-
+auto_speed = -.3
 # Autonomous
 auto_case = 1
 
