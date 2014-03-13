@@ -16,7 +16,7 @@
 #include "Collection.h"
 #include "Target.h"
 
-#define DISABLE_SHOOTER
+//#define DISABLE_SHOOTER
 //#define DISABLE_AUTONOMOUS
 
 using namespace std;
