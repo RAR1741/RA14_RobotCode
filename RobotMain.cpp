@@ -56,10 +56,10 @@ private:
 
 	TargetServer * server;
 	Target * target;
-	CurrentSensorSlot * camMotor1Slot;
-	CurrentSensorSlot * camMotor2Slot;
-	CurrentSensorSlot * driveLeftSlot;
-	CurrentSensorSlot * driveRightSlot;
+	//CurrentSensorSlot * camMotor1Slot;
+	//CurrentSensorSlot * camMotor2Slot;
+	//CurrentSensorSlot * driveLeftSlot;
+	//CurrentSensorSlot * driveRightSlot;
 	Timer * resetCurrentSensorTimer;
 
 	DigitalInput * currentSensor1Reset;
@@ -101,10 +101,10 @@ public:
 		server = NULL;
 		target = NULL;
 
-		camMotor1Slot = NULL;
-		camMotor2Slot = NULL;
-		driveLeftSlot = NULL;
-		driveRightSlot = NULL;
+		//camMotor1Slot = NULL;
+		//camMotor2Slot = NULL;
+		//driveLeftSlot = NULL;
+		//driveRightSlot = NULL;
 
 		currentSensor1Reset = NULL;
 		resetCurrentSensorTimer = NULL;
@@ -152,10 +152,10 @@ public:
 		resetCurrentSensorTimer = new Timer();
 		resetCurrentSensorTimer->Start();
 
-		camMotor1Slot = new CurrentSensorSlot(2);
-		camMotor2Slot = new CurrentSensorSlot(1);
-		driveLeftSlot = new CurrentSensorSlot(4);
-		driveRightSlot = new CurrentSensorSlot(3);
+		//camMotor1Slot = new CurrentSensorSlot(2);
+		//camMotor2Slot = new CurrentSensorSlot(1);
+		//driveLeftSlot = new CurrentSensorSlot(4);
+		//driveRightSlot = new CurrentSensorSlot(3);
 
 		cout << "Current sensor initialized." << endl;
 
@@ -186,7 +186,7 @@ public:
 		//myOdometer = new Odometer(4, 5);
 		auto_case = (int) Config::GetSetting("auto_case", 1);
 		cout << "Setting up Gyro, please do NOT move the robot..." << endl;
-		gyro = new Gyro(5);
+		gyro = new Gyro(1);
 		cout << "Gyro initialized." << endl;
 
 		this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
@@ -214,12 +214,12 @@ public:
 		//signalOutCycle->Set(1);
 		toggleOut = !toggleOut;
 		//signalOutToggle->Set( toggleOut );
-		CurrentSensorSlot * slots[4] = { camMotor1Slot, camMotor2Slot,
-				driveLeftSlot, driveRightSlot };
+		//CurrentSensorSlot * slots[4] = { camMotor1Slot, camMotor2Slot,
+		//		driveLeftSlot, driveRightSlot };
 
-		for (int i = 0; i < 4; ++i) {
-			slots[i]->Process();
-		}
+		//for (int i = 0; i < 4; ++i) {
+		//	slots[i]->Process();
+		//}
 
 	}
 
@@ -285,6 +285,9 @@ public:
 		alreadyInitialized = true;
 		missionTimer->Start();
 		myDrive->ResetOdometer();
+		myCamera->Set(Relay::kForward);
+		myCollection->ExtendArm();
+		gyro->Reset();
 		//myOdometer->Reset();
 		myDrive->ShiftDown();
 		if (!fout.is_open()) {
@@ -308,7 +311,21 @@ public:
 		StartOfCycleMaintenance();
 
 		target->Parse(server->GetLatestPacket());
-		float speed = Config::GetSetting("auto_speed", .3);
+		float speed = Config::GetSetting("auto_speed", .1);
+		cout<<"Gyro angle: "<<gyro->GetAngle()<<endl;
+		
+		if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+		{
+			cout<<"Distance traveled: "<<myDrive->GetOdometer()<<" inches"<<endl;
+			myDrive->Drive(speed,speed);
+		}
+		else
+		{
+			myDrive->Drive(0,0);
+			cout << "FIRING" << endl;
+			myCam->Process(1,0);
+		}
+		
 #ifndef DISABLE_AUTONOMOUS
 		switch(auto_case)
 		{
@@ -368,16 +385,16 @@ public:
 			cout<<auto_case<<endl;
 			cout<<"Error in autonomous"<<endl;
 		}
-#else
-		if (myDrive->GetOdometer() <= (4 * acos(-1) ) ) //216 is distance from robot to goal
-		{
-			float speed = Config::GetSetting("auto_speed", .3);
-			cout << myDrive->GetOdometer() << endl;
-			myDrive->Drive(speed, speed);
-		} else {
-			cout << "Finished driving";
-			myDrive->Drive(0, 0);
-		}
+//#else
+//		if (myDrive->GetOdometer() <= (4 * acos(-1) ) ) //216 is distance from robot to goal
+//		{
+//			float speed = Config::GetSetting("auto_speed", .3);
+//			cout << myDrive->GetOdometer() << endl;
+//			myDrive->Drive(speed, speed);
+//		} else {
+//			cout << "Finished driving";
+//			myDrive->Drive(0, 0);
+//		}
 #endif
 
 		EndOfCycleMaintenance();
@@ -597,12 +614,12 @@ public:
 		myCam->log(fout);
 #endif
 		myDrive->log(fout);
-		CurrentSensorSlot * slots[4] = { camMotor1Slot, camMotor2Slot,
-				driveLeftSlot, driveRightSlot };
+		//CurrentSensorSlot * slots[4] = { camMotor1Slot, camMotor2Slot,
+		//		driveLeftSlot, driveRightSlot };
 
-		for (int i = 0; i < 4; ++i) {
-			fout << slots[i]->Get() << ",";
-		}
+		//for (int i = 0; i < 4; ++i) {
+		//	fout << slots[i]->Get() << ",";
+		//}
 
 		fout << auto_case << "," << 0 << ",";
 		fout << endl;
