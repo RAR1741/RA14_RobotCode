@@ -623,7 +623,7 @@ public:
 #endif
 		myDrive->logHeaders(fout);
 		fout
-				<< "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading,DropSensor";
+				<< "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading,DropSensor,BatteryVoltage";
 		fout << endl;
 	}
 
@@ -636,12 +636,14 @@ public:
 		myDrive->log(fout);
 		CurrentSensorSlot * slots[4] = { camMotor1Slot, camMotor2Slot,
 				driveLeftSlot, driveRightSlot };
+		
+		DriverStation * ds = DriverStation::GetInstance();
 
 		for (int i = 0; i < 4; ++i) {
 			fout << slots[i]->Get() << ",";
 		}
 
-		fout << auto_case << "," << gyro->GetAngle() << "," << dropSensor->GetPosition() << ",";
+		fout << auto_case << "," << gyro->GetAngle() << "," << dropSensor->GetPosition() << "," << ds->GetBatteryVoltage() << ","; 
 		fout << endl;
 		}
 	}
