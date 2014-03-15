@@ -43,7 +43,7 @@ private:
 	bool ShouldFireButton;
 	bool RingLightButton;
 	bool BallCollectPickupButton;
-	Gamepad::DPadDirection DriverDPad;
+	Gamepad::DPadDirection OperatorDPad;
 
 	DigitalOutput * CurrentSensorReset;
 
@@ -98,7 +98,7 @@ public:
 		alreadyInitialized = false;
 		ShouldFireButton = false;
 		BallCollectPickupButton = false;
-		DriverDPad = Gamepad::kCenter;
+		OperatorDPad = Gamepad::kCenter;
 		//myOdometer = NULL;
 
 		server = NULL;
@@ -457,10 +457,10 @@ public:
 		DriverRightY = DriverGamepad->GetRightY();
 		DriverLeftBumper = DriverGamepad->GetLeftBumper(); // Reads state of left bumper 
 		DriverRightBumper = DriverGamepad->GetRightBumper(); // Gets state of right bumper
-		RingLightButton = DriverGamepad->GetY();
+		RingLightButton = OperatorGamepad->GetY();
 		ShouldFireButton = DriverGamepad->GetRightTrigger();
 		BallCollectPickupButton = DriverGamepad->GetBack();
-		DriverDPad = DriverGamepad->GetDPad();
+		OperatorDPad = OperatorGamepad->GetDPad();
 		//End Input Acquisition
 
 
@@ -502,7 +502,7 @@ public:
 		int armPosition = 0;
 		int rollerPosition = 0;
 
-		switch (DriverDPad) {
+		switch (OperatorDPad) {
 		case Gamepad::kCenter:
 			armPosition = 0;
 			rollerPosition = 0;
@@ -538,7 +538,14 @@ public:
 		}
 
 		if (DriverGamepad->GetLeftTrigger()) {
+			armPosition = 0;
 			rollerPosition = -1;
+		}
+		
+		if(DriverGamepad->GetB())
+		{
+			armPosition = -1;
+			rollerPosition = 1;
 		}
 
 		spinSpeed *= rollerPosition;
@@ -553,10 +560,10 @@ public:
 		//Fire Control
 
 #ifndef DISABLE_SHOOTER
-		myCam->Process(ShouldFireButton, DriverGamepad->GetX(), DriverGamepad->GetB());
+		myCam->Process(ShouldFireButton, (OperatorGamepad->GetX() || DriverGamepad->GetX() ), DriverGamepad->GetB());
 		myCam->Debug(cout);
 #endif
-
+		
 		//End Fire Control
 
 

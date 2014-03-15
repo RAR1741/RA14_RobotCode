@@ -30,7 +30,7 @@ auto_heading_p = .2
 auto_speed = -.3
 auto_firing_distance = 132
 # collection
-intake_roller_speed = 0.3
+intake_roller_speed = 0.5
 
 # Camera meta-config (meant for dashboard, not robot)
 target_r = 55
