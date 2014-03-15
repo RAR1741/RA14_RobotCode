@@ -630,7 +630,7 @@ public:
 #endif
 		myDrive->logHeaders(fout);
 		fout
-				<< "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading,DropSensor,BatteryVoltage";
+				<< "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading,DropSensor,BatteryVoltage,MatchTime,";
 		fout << endl;
 	}
 
@@ -650,7 +650,8 @@ public:
 			fout << slots[i]->Get() << ",";
 		}
 
-		fout << auto_case << "," << gyro->GetAngle() << "," << dropSensor->GetPosition() << "," << ds->GetBatteryVoltage() << ","; 
+		fout << auto_case << "," << gyro->GetAngle() << "," << dropSensor->GetPosition() << "," << ds->GetBatteryVoltage() << ",";
+		fout << ds->GetMatchTime() << ",";
 		fout << endl;
 		}
 	}
