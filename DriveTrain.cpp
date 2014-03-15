@@ -26,6 +26,8 @@ DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int le
 	ConfigureEncoder(LEncoder);
 	ConfigureEncoder(REncoder);
 	
+	reverseDriving = false;
+	
 	//Odometer
 	/*
 	odometer = new Odometer(leftencoder_a,leftencoder_b);
@@ -52,10 +54,20 @@ void DriveTrain::Drive(double LeftStickY, double RightStickY)
 	
 	cout << "Left drive: " << left << "\nRight drive: " << right << endl;
 	
-	FLMotor->Set(left);
-	RLMotor->Set(left);
-	FRMotor->Set(right);
-	RRMotor->Set(right);
+	//if(!reverseDriving)
+	//{
+		FLMotor->Set(left);
+		RLMotor->Set(left);
+		FRMotor->Set(right);
+		RRMotor->Set(right);
+	//}
+	//else
+	//{
+		//FLMotor->Set(left * -1);
+		//RLMotor->Set(left * -1);
+		//FRMotor->Set(right * -1);
+		//RRMotor->Set(right * -1);
+	//}
 	
 }
 
@@ -63,6 +75,12 @@ void DriveTrain::DriveArcade(float x, float y)
 {
 	float leftOut = 0;
 	float rightOut = 0;
+	
+	if(reverseDriving)
+	{
+		//x = x*-1;
+		y = y * -1;
+	}
 	
 	if (y > 0) {
 		if (x > 0) {
@@ -122,6 +140,14 @@ void DriveTrain::log(ostream &f)
 		f << motors[i]->Get() << ",";
 	}
 	f << LEncoder->GetRate() << "," << REncoder->GetRate() << ",";	
+}
+void DriveTrain::reverseDirectionForward()
+{
+	reverseDriving = false;
+}
+void DriveTrain::reverseDirectionReverse()
+{
+	reverseDriving = true;
 }
 /*
 Odometer* DriveTrain::getOdometer()

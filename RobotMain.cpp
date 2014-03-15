@@ -43,6 +43,7 @@ private:
 	bool ShouldFireButton;
 	bool RingLightButton;
 	bool BallCollectPickupButton;
+	Gamepad::DPadDirection DriverDPad;
 	Gamepad::DPadDirection OperatorDPad;
 
 	DigitalOutput * CurrentSensorReset;
@@ -98,6 +99,7 @@ public:
 		alreadyInitialized = false;
 		ShouldFireButton = false;
 		BallCollectPickupButton = false;
+		DriverDPad = Gamepad::kCenter;
 		OperatorDPad = Gamepad::kCenter;
 		//myOdometer = NULL;
 
@@ -460,6 +462,7 @@ public:
 		RingLightButton = OperatorGamepad->GetY();
 		ShouldFireButton = DriverGamepad->GetRightTrigger();
 		BallCollectPickupButton = DriverGamepad->GetBack();
+		DriverDPad = DriverGamepad->GetDPad();
 		OperatorDPad = OperatorGamepad->GetDPad();
 		//End Input Acquisition
 
@@ -584,6 +587,17 @@ public:
 
 
 		//Drive Processing
+		if(DriverDPad == Gamepad::kUp)
+		{
+			cout << "Forward" << endl;
+			myDrive->reverseDirectionForward();
+		}
+		else if(DriverDPad == Gamepad::kDown)
+		{
+			cout << "Backward"<<endl;
+			myDrive->reverseDirectionReverse();
+		}
+		
 		if (DriverLeftBumper) {
 			myDrive->ShiftUp();
 		} else if (DriverRightBumper) {

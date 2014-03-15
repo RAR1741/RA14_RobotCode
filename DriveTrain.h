@@ -31,6 +31,9 @@ public:
 	void logHeaders(ostream &f);
 	void log(std::ostream &f);
 	
+	void reverseDirectionForward();
+	void reverseDirectionReverse();
+	
 	//return odometer object
 	//Odometer* getOdometer();
 	
@@ -54,6 +57,9 @@ private:
 	
 	//Odometer
 	Odometer* odometer;
+	
+	//Reverse
+	bool reverseDriving;
 
 	float DeadZone(float input);
 	
