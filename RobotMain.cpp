@@ -425,6 +425,7 @@ public:
 	 * the robot enters teleop mode.
 	 */
 	void RA14Robot::TeleopInit() {
+		Config::LoadFromFile("config.txt");
 		myCompressor->Start();
 		alreadyInitialized = true;
 		missionTimer->Start();
