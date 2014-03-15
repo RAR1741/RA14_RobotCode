@@ -2,7 +2,7 @@
 # CAM PID
 cam_p = .08
 cam_i = .0001
-cam_d = .000
+cam_d = .001
 
 # Robot Loop period
 robot_loop_period = .02
