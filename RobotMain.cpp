@@ -18,7 +18,7 @@
 #include "DropSensor.h"
 
 //#define DISABLE_SHOOTER
-#define DISABLE_AUTONOMOUS
+//#define DISABLE_AUTONOMOUS
 
 using namespace std;
 
@@ -333,17 +333,6 @@ public:
 		float corrected = error * -1 * Config::GetSetting("auto_heading_p", .01);
 		cout<<"Gyro angle: "<<angle<<endl;
 		cout <<"Corrected: " << corrected << endl;
-		if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
-		{
-			cout<<"Distance traveled: "<<myDrive->GetOdometer()<<" inches"<<endl;
-			myDrive->Drive(corrected, speed);
-		}
-		else
-		{
-			myDrive->Drive(0,0);
-			cout << "FIRING" << endl;
-			myCam->Process(1,0);
-		}
 		
 #ifndef DISABLE_AUTONOMOUS
 		switch(auto_case)
@@ -357,7 +346,7 @@ public:
 				//{
 					if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
 					{
-						myDrive->Drive(speed,speed);
+						myDrive->Drive(corrected,speed);
 					}
 					else
 					{
@@ -379,7 +368,7 @@ public:
 				//Drive forward and wait to shoot 
 				if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
 				{
-					myDrive->Drive(speed, speed);
+					myDrive->Drive(corrected, speed);
 				}
 				else
 				{
@@ -400,6 +389,21 @@ public:
 				cout << "Not valid target." << endl;
 			}
 			break;
+			
+			case 2:
+			if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+			{
+				cout<<"Distance traveled: "<<myDrive->GetOdometer()<<" inches"<<endl;
+				myDrive->Drive(corrected, speed);
+			}
+			else
+			{
+				myDrive->Drive(0,0);
+				cout << "FIRING" << endl;
+				myCam->Process(1,0);
+			}
+			break;
+			
 			default:
 			cout<<auto_case<<endl;
 			cout<<"Error in autonomous"<<endl;
