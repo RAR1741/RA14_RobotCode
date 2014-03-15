@@ -56,6 +56,19 @@ public:
 	
 	bool IndexTripped();
 	void Reset();
+	
+	int GetState() {
+		int copy_of_state = 0;
+		CRITICAL_REGION(AccessSemaphore)
+		{
+			copy_of_state = m_state;
+		}
+		END_REGION;
+		return copy_of_state;
+	}
+	
+	bool IsReadyToFire()  { return GetState() == CamShooter::ReadyToFire; }
+	bool IsReadyToRearm() { return GetState() == CamShooter::Firing; }
 private:
 	
 	static void CallInnerProcess(void * camshooter);

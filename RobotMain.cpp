@@ -55,6 +55,7 @@ private:
 
 	int auto_case;
 	int auto_timer;
+	int auto_state;
 
 	TargetServer * server;
 	Target * target;
@@ -402,6 +403,13 @@ public:
 				cout << "FIRING" << endl;
 				myCam->Process(1,0);
 			}
+			break;
+			
+			case 3:
+			if (myCam->IsReadyToFire()) {
+				
+			}
+				
 			break;
 			
 			default:
