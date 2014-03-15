@@ -19,6 +19,7 @@
 
 #define DISABLE_SHOOTER
 //#define DISABLE_AUTONOMOUS
+//TODO: Implement stub version of shooter class
 
 using namespace std;
 
