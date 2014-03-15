@@ -25,6 +25,7 @@ public:
 	float GetOdometer() { return REncoder->GetDistance(); }
 	void ResetOdometer() { LEncoder->Reset(); REncoder->Reset(); }
 	void Drive(double LeftStickY, double RightStickY);
+	void DriveArcade(float x, float y);
 	void ShiftUp();
 	void ShiftDown();
 	void logHeaders(ostream &f);

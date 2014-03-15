@@ -4,8 +4,11 @@
 #include <iomanip>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 using namespace std;
+
+const double kPi = 3.14159265358979;
 
 DriveTrain::DriveTrain(int fl, int rl, int fr, int rr,int leftsolforward, int leftsolreverse,
 		int leftencoder_a, int leftencoder_b, int rightencoder_a, int rightencoder_b)
@@ -56,6 +59,32 @@ void DriveTrain::Drive(double LeftStickY, double RightStickY)
 	
 }
 
+void DriveTrain::DriveArcade(float x, float y)
+{
+	float leftOut = 0;
+	float rightOut = 0;
+	
+	if (y > 0) {
+		if (x > 0) {
+			leftOut = y - x;
+			rightOut = max(y, x);
+		} else {
+			leftOut = max(y, -x);
+			rightOut = y + x;
+		}
+	} else {
+		if (x > 0) {
+			leftOut = - max(-y, x);
+			rightOut = y + x;
+		} else {
+			leftOut = y - x;
+			rightOut = - max(-y, -x);
+		}
+	}
+	
+	Drive(leftOut, rightOut);
+}
+
 void DriveTrain::ShiftUp() //Shifts to the higher gear
 {
 	LeftSol->Set(DoubleSolenoid::kReverse);
@@ -76,7 +105,7 @@ float DriveTrain::DeadZone(float input) { //Returns 0 if joystick inputs are wit
 
 void DriveTrain::ConfigureEncoder(Encoder * e)
 {
-	float feet_per_pulse = 12.5 / 12.0 / 250.0;		
+	float feet_per_pulse = 4 * kPi / 250.0;		
 	e->Reset();
 	e->SetDistancePerPulse(feet_per_pulse);
 	e->Start();
@@ -84,16 +113,6 @@ void DriveTrain::ConfigureEncoder(Encoder * e)
 
 void DriveTrain::logHeaders(ostream &f)
 {
-	/*
-	char * motor_names[4] = { "FrontLeft", "FrontRight", "RearLeft", "RearRight" };
-	char * header_names[3] = { "Setpoint","Output","Current"};
-	
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 3; j++) {
-			f << motor_names[i] << " " << header_names[j] << ","; 
-		}
-	}
-	*/
 	f << "FrontLeftMotorOutput,FrontRightMotorOutput,RearLeftMotorOutput,RearRightMotorOutput,LeftEncoder,RightEncoder,";
 }
 void DriveTrain::log(ostream &f)
@@ -102,17 +121,7 @@ void DriveTrain::log(ostream &f)
 	for (int i = 0; i < 4; i++) {
 		f << motors[i]->Get() << ",";
 	}
-	f << LEncoder->GetRate() << "," << REncoder->GetRate() << ",";
-	/*
-	//log for each module
-	
-	SpeedControlTalon * motors[4] = { FLMotor, FRMotor, RLMotor, RRMotor };
-	CurrentSensor * sensors[4] = { FLSensor, FRSensor, RLSensor, RRSensor };  
-	for (int i = 0; i < 4; i++) {
-		f << motors[i]->GetSetpoint() << "," <<  motors[i]->GetOutput() << ",";
-		f << sensors[i]->GetCurrent() << ",";
-	}
-	*/
+	f << LEncoder->GetRate() << "," << REncoder->GetRate() << ",";	
 }
 /*
 Odometer* DriveTrain::getOdometer()

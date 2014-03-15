@@ -15,6 +15,7 @@
 #include "SpeedControlTalon.h"
 #include "Collection.h"
 #include "Target.h"
+#include "DropSensor.h"
 
 //#define DISABLE_SHOOTER
 //#define DISABLE_AUTONOMOUS
@@ -56,10 +57,10 @@ private:
 
 	TargetServer * server;
 	Target * target;
-	//CurrentSensorSlot * camMotor1Slot;
-	//CurrentSensorSlot * camMotor2Slot;
-	//CurrentSensorSlot * driveLeftSlot;
-	//CurrentSensorSlot * driveRightSlot;
+	CurrentSensorSlot * camMotor1Slot;
+	CurrentSensorSlot * camMotor2Slot;
+	CurrentSensorSlot * driveLeftSlot;
+	CurrentSensorSlot * driveRightSlot;
 	Timer * resetCurrentSensorTimer;
 
 	DigitalInput * currentSensor1Reset;
@@ -70,6 +71,8 @@ private:
 	Timer * missionTimer;
 
 	Gyro * gyro;
+	float targetHeading;
+	DropSensor * dropSensor;
 
 public:
 	RA14Robot() {
@@ -101,10 +104,10 @@ public:
 		server = NULL;
 		target = NULL;
 
-		//camMotor1Slot = NULL;
-		//camMotor2Slot = NULL;
-		//driveLeftSlot = NULL;
-		//driveRightSlot = NULL;
+		camMotor1Slot = NULL;
+		camMotor2Slot = NULL;
+		driveLeftSlot = NULL;
+		driveRightSlot = NULL;
 
 		currentSensor1Reset = NULL;
 		resetCurrentSensorTimer = NULL;
@@ -113,6 +116,9 @@ public:
 		signalOutToggle = NULL;
 
 		gyro = NULL;
+		targetHeading = 0;
+		
+		dropSensor = NULL;
 	}
 
 	/**
@@ -152,10 +158,10 @@ public:
 		resetCurrentSensorTimer = new Timer();
 		resetCurrentSensorTimer->Start();
 
-		//camMotor1Slot = new CurrentSensorSlot(2);
-		//camMotor2Slot = new CurrentSensorSlot(1);
-		//driveLeftSlot = new CurrentSensorSlot(4);
-		//driveRightSlot = new CurrentSensorSlot(3);
+		camMotor1Slot = new CurrentSensorSlot(3);
+		camMotor2Slot = new CurrentSensorSlot(4);
+		driveLeftSlot = new CurrentSensorSlot(5);
+		driveRightSlot = new CurrentSensorSlot(6);
 
 		cout << "Current sensor initialized." << endl;
 
@@ -186,8 +192,12 @@ public:
 		//myOdometer = new Odometer(4, 5);
 		auto_case = (int) Config::GetSetting("auto_case", 1);
 		cout << "Setting up Gyro, please do NOT move the robot..." << endl;
-		gyro = new Gyro(1);
+		gyro = new Gyro(2);
 		cout << "Gyro initialized." << endl;
+		
+		cout << "Initializing drop sensor" << endl;
+		dropSensor = new DropSensor(7);
+		cout << "Drop sensor initialized." << endl;
 
 		this->SetPeriod(Config::GetSetting("robot_loop_period", 0.05));
 		cout << "Period set to " << this->GetLoopsPerSec() << "Hz" << endl;
@@ -233,6 +243,9 @@ public:
 			resetCurrentSensorTimer->Reset();
 			CurrentSensorReset->Set(0);
 		}
+		
+		logging();
+		target->Parse("");
 		//signalOutCycle->Set(0);
 	}
 
@@ -312,12 +325,17 @@ public:
 
 		target->Parse(server->GetLatestPacket());
 		float speed = Config::GetSetting("auto_speed", .1);
-		cout<<"Gyro angle: "<<gyro->GetAngle()<<endl;
+		float angle = gyro->GetAngle();
 		
+		float error = targetHeading - angle;
+		float corrected = error * -1 * Config::GetSetting("auto_heading_p", .01);
+		cout<<"Gyro angle: "<<angle<<endl;
+		cout <<"Corrected: " << corrected << endl;
 		if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
 		{
 			cout<<"Distance traveled: "<<myDrive->GetOdometer()<<" inches"<<endl;
-			myDrive->Drive(speed,speed);
+			myDrive->Drive(corrected, speed);
+			//myDrive->Drive(speed,speed);
 		}
 		else
 		{
@@ -564,12 +582,12 @@ public:
 			myDrive->ShiftDown();
 		}
 
-		myDrive->Drive(DriverLeftY, DriverRightY);
+		//myDrive->Drive(DriverLeftY, DriverRightY);
+		myDrive->DriveArcade(DriverGamepad->GetRightX(), DriverGamepad->GetRightY());
 		myDrive->Debug(cout);
 		//End Drive Processing
 
-		logging();
-		target->Parse("");
+
 		EndOfCycleMaintenance();
 	}
 
@@ -604,25 +622,27 @@ public:
 #endif
 		myDrive->logHeaders(fout);
 		fout
-				<< "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading";
+				<< "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading,DropSensor";
 		fout << endl;
 	}
 
 	void RA14Robot::logging() {
+		if (fout.is_open()) {
 		fout << missionTimer->Get() << ",";
 #ifndef DISABLE_SHOOTER
 		myCam->log(fout);
 #endif
 		myDrive->log(fout);
-		//CurrentSensorSlot * slots[4] = { camMotor1Slot, camMotor2Slot,
-		//		driveLeftSlot, driveRightSlot };
+		CurrentSensorSlot * slots[4] = { camMotor1Slot, camMotor2Slot,
+				driveLeftSlot, driveRightSlot };
 
-		//for (int i = 0; i < 4; ++i) {
-		//	fout << slots[i]->Get() << ",";
-		//}
+		for (int i = 0; i < 4; ++i) {
+			fout << slots[i]->Get() << ",";
+		}
 
-		fout << auto_case << "," << 0 << ",";
+		fout << auto_case << "," << gyro->GetAngle() << "," << dropSensor->GetPosition() << ",";
 		fout << endl;
+		}
 	}
 
 };
