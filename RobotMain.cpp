@@ -17,7 +17,7 @@
 #include "Target.h"
 #include "DropSensor.h"
 
-//#define DISABLE_SHOOTER
+#define DISABLE_SHOOTER
 //#define DISABLE_AUTONOMOUS
 
 using namespace std;
@@ -404,12 +404,14 @@ public:
 			{
 				myDrive->Drive(0,0);
 				cout << "FIRING" << endl;
+#ifndef DISABLE_SHOOTER
 				myCam->Process(1,0);
+#endif
 			}
 			break;
 			
 			case 3:
-				
+#ifndef DISABLE_SHOOTER
 			switch(auto_state) {
 				case 0:
 					// Home/rearm
@@ -465,6 +467,7 @@ public:
 				default:
 					cout << "Error, unrecognized state " << auto_state << endl;
 			}
+#endif
 			
 			break;
 			
