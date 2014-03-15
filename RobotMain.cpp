@@ -18,7 +18,7 @@
 #include "DropSensor.h"
 
 //#define DISABLE_SHOOTER
-//#define DISABLE_AUTONOMOUS
+#define DISABLE_AUTONOMOUS
 
 using namespace std;
 
@@ -337,7 +337,6 @@ public:
 		{
 			cout<<"Distance traveled: "<<myDrive->GetOdometer()<<" inches"<<endl;
 			myDrive->Drive(corrected, speed);
-			//myDrive->Drive(speed,speed);
 		}
 		else
 		{
