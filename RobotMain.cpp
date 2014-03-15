@@ -510,7 +510,7 @@ public:
 #ifndef DISABLE_SHOOTER
 		myCam->Reset();
 		myCam->Enable();
-#endif
+#endif //Ends DISABLE_SHOOTER
 	}
 
 	/**
