@@ -646,8 +646,8 @@ public:
 		myCam->logHeaders(fout);
 #endif
 		myDrive->logHeaders(fout);
-		fout
-				<< "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading,DropSensor,BatteryVoltage,MatchTime,";
+		fout << "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading,DropSensor,BatteryVoltage,";
+		fout << "TargetValid,TargetHot,TargetDistance,TargetX,TargetY,TargetIsLeft,TargetIsRight,MatchTime,";
 		fout << endl;
 	}
 
@@ -668,6 +668,8 @@ public:
 		}
 
 		fout << auto_case << "," << gyro->GetAngle() << "," << dropSensor->GetPosition() << "," << ds->GetBatteryVoltage() << ",";
+		fout << target->IsValid() << "," << target->IsHot() << "," <<  target->GetDistance() << "," << target->GetX() << ",";
+		fout << target->GetY() << "," << target->IsLeft() << "," << target->IsRight() << ",";
 		fout << ds->GetMatchTime() << ",";
 		fout << endl;
 		}
