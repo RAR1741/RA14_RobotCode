@@ -75,6 +75,7 @@ private:
 	Gyro * gyro;
 	float targetHeading;
 	DropSensor * dropSensor;
+	Timer * auto_waiter;
 
 public:
 	RA14Robot() {
@@ -122,6 +123,7 @@ public:
 		targetHeading = 0;
 		
 		dropSensor = NULL;
+		auto_waiter = NULL;
 	}
 
 	/**
@@ -211,6 +213,7 @@ public:
 
 		cout << "Mission Timer starting:" << endl;
 		missionTimer = new Timer();
+		auto_waiter = new Timer();
 		cout << "Mission timer started: " << missionTimer->Get() << "s" << endl;
 
 		cout << "Signaling system starting..." << endl;
@@ -406,10 +409,63 @@ public:
 			break;
 			
 			case 3:
-			if (myCam->IsReadyToFire()) {
 				
+			switch(auto_state) {
+				case 0:
+					// Home/rearm
+					// fire, rearm, eject
+					myCam->Process(false, false, false);
+					if (myCam->IsReadyToFire()) {
+						auto_state = 1;
+					}
+					break;
+				case 1:
+					// fire
+					myCam->Process(true, false, false);
+					if (myCam->IsReadyToRearm()) {
+						auto_state = 2;
+					}
+					break;
+				case 2:
+					// rearm
+					myCam->Process(false, true, false);
+					if (myCam->IsReadyToFire()) {
+						auto_state = 3;
+						auto_waiter->Reset();
+						auto_waiter->Start();
+					}
+					break;
+				case 3:
+					myCam->Process(false, false, false);
+					myCollection->SpinMotor(Config::GetSetting("intake_roller_speed", .7));
+					if (auto_waiter->HasPeriodPassed( Config::GetSetting("auto_collection_delay", 1.0) )) {
+						auto_state = 4;
+					}
+					break;
+				case 4:
+					// fire again!
+					myCam->Process(true, false, false);
+					auto_state = 5;
+					break;
+				case 5:
+					myCam->Process(false, false, false);
+					
+					if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+					{
+						myDrive->Drive(corrected, speed);
+					} else {
+						// now at the firing spot.
+						auto_state = 6;
+						myDrive->Drive(0,0);
+					}
+					break;
+				case 6:
+					myCollection->RetractArm();
+					break;
+				default:
+					cout << "Error, unrecognized state " << auto_state << endl;
 			}
-				
+			
 			break;
 			
 			default:
@@ -655,7 +711,7 @@ public:
 #endif
 		myDrive->logHeaders(fout);
 		fout << "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading,DropSensor,BatteryVoltage,";
-		fout << "TargetValid,TargetHot,TargetDistance,TargetX,TargetY,TargetIsLeft,TargetIsRight,MatchTime,";
+		fout << "TargetValid,TargetHot,TargetDistance,TargetX,TargetY,TargetIsLeft,TargetIsRight,MatchTime,AutoInternalState,";
 		fout << endl;
 	}
 
@@ -678,7 +734,7 @@ public:
 		fout << auto_case << "," << gyro->GetAngle() << "," << dropSensor->GetPosition() << "," << ds->GetBatteryVoltage() << ",";
 		fout << target->IsValid() << "," << target->IsHot() << "," <<  target->GetDistance() << "," << target->GetX() << ",";
 		fout << target->GetY() << "," << target->IsLeft() << "," << target->IsRight() << ",";
-		fout << ds->GetMatchTime() << ",";
+		fout << ds->GetMatchTime() << "," << auto_state << ",";
 		fout << endl;
 		}
 	}
