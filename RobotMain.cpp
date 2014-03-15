@@ -27,7 +27,7 @@ private:
 	ofstream fout;
 #ifndef DISABLE_SHOOTER
 	CamShooter * myCam;
-#endif
+#endif //Ends DISABLE_SHOOTER
 	CANJaguar * myJag;
 	DriveTrain * myDrive;
 	Relay * myCamera;
@@ -54,7 +54,6 @@ private:
 	bool alreadyInitialized;
 
 	int auto_case;
-	int auto_timer;
 	int auto_state;
 
 	TargetServer * server;
@@ -75,14 +74,14 @@ private:
 	Gyro * gyro;
 	float targetHeading;
 	DropSensor * dropSensor;
-	Timer * auto_waiter;
+	Timer * auto_timer;
 
 public:
 	RA14Robot() {
 		//myCurrentSensor = NULL;
 #ifndef DISABLE_SHOOTER
 		myCam = NULL;
-#endif
+#endif //Ends DISABLE_SHOOTER
 		myDrive = NULL;
 		DriverGamepad = NULL;
 		OperatorGamepad = NULL;
@@ -123,7 +122,7 @@ public:
 		targetHeading = 0;
 		
 		dropSensor = NULL;
-		auto_waiter = NULL;
+		auto_timer = NULL;
 	}
 
 	/**
@@ -149,9 +148,9 @@ public:
 		cout << "Initializing cam shooter..." << endl;
 #ifndef DISABLE_SHOOTER
 		myCam = new CamShooter(5, 6, 2, 1, 3, 13, 14, Config::GetSetting("cam_loop_period", .004));
-#else
+#else 
 		cout << "Cam shooter DISABLED!" << endl;
-#endif
+#endif //Ends DISABLE_SHOOTER
 		cout << "Cam shooter initialized." << endl;
 
 		cout << "Initializing drivetrain..." << endl;
@@ -213,7 +212,7 @@ public:
 
 		cout << "Mission Timer starting:" << endl;
 		missionTimer = new Timer();
-		auto_waiter = new Timer();
+		auto_timer = new Timer();
 		cout << "Mission timer started: " << missionTimer->Get() << "s" << endl;
 
 		cout << "Signaling system starting..." << endl;
@@ -272,7 +271,7 @@ public:
 
 #ifndef DISABLE_SHOOTER 
 		myCam->Reset();
-#endif
+#endif //Ends DISABLE_SHOOTER
 
 		/*
 		 if(fout.is_open()) {
@@ -317,7 +316,7 @@ public:
 #ifndef DISABLE_SHOOTER
 		myCam->Reset();
 		myCam->Enable();
-#endif
+#endif //Ends DISABLE_SHOOTER
 	}
 
 	/**
@@ -358,7 +357,7 @@ public:
 						cout << "FIRING" << endl;
 #ifndef DISABLE_SHOOTER
 						myCam->Process(1,0);
-#endif
+#endif //Ends DISABLE_SHOOTER
 					}
 				/*}
 				else
@@ -383,7 +382,7 @@ public:
 						cout << "FIRING" << endl;
 #ifndef DISABLE_SHOOTER
 						myCam->Process(1,0);
-#endif
+#endif //Ends DISABLE_SHOOTER
 					}
 				}
 			}
@@ -406,7 +405,7 @@ public:
 				cout << "FIRING" << endl;
 #ifndef DISABLE_SHOOTER
 				myCam->Process(1,0);
-#endif
+#endif //Ends DISABLE_SHOOTER
 			}
 			break;
 			
@@ -433,14 +432,14 @@ public:
 					myCam->Process(false, true, false);
 					if (myCam->IsReadyToFire()) {
 						auto_state = 3;
-						auto_waiter->Reset();
-						auto_waiter->Start();
+						auto_timer->Reset();
+						auto_timer->Start();
 					}
 					break;
 				case 3:
 					myCam->Process(false, false, false);
 					myCollection->SpinMotor(Config::GetSetting("intake_roller_speed", .7));
-					if (auto_waiter->HasPeriodPassed( Config::GetSetting("auto_collection_delay", 1.0) )) {
+					if (auto_timer->HasPeriodPassed( Config::GetSetting("auto_collection_delay", 1.0) )) {
 						auto_state = 4;
 					}
 					break;
@@ -467,13 +466,12 @@ public:
 				default:
 					cout << "Error, unrecognized state " << auto_state << endl;
 			}
-#endif
+#endif //Ends DISABLE_SHOOTER
 			
 			break;
 			
 			default:
-			cout<<auto_case<<endl;
-			cout<<"Error in autonomous"<<endl;
+			cout<<"Error in autonomous, unrecognized case: "<<auto_case<<endl;
 		}
 //#else
 //		if (myDrive->GetOdometer() <= (4 * acos(-1) ) ) //216 is distance from robot to goal
@@ -485,7 +483,7 @@ public:
 //			cout << "Finished driving";
 //			myDrive->Drive(0, 0);
 //		}
-#endif
+#endif //Ends DISABLE_AUTONOMOUS
 
 		EndOfCycleMaintenance();
 	}
@@ -635,7 +633,7 @@ public:
 #ifndef DISABLE_SHOOTER
 		myCam->Process(ShouldFireButton, (OperatorGamepad->GetX() || DriverGamepad->GetX() ), DriverGamepad->GetB());
 		myCam->Debug(cout);
-#endif
+#endif //Ends DISABLE_SHOOTER
 		
 		//End Fire Control
 
@@ -711,7 +709,7 @@ public:
 		fout << "MissionTimer,";
 #ifndef DISABLE_SHOOTER
 		myCam->logHeaders(fout);
-#endif
+#endif //Ends DISABLE_SHOOTER
 		myDrive->logHeaders(fout);
 		fout << "CAMLeftCurrent,CAMRightCurrent,DriveLeftCurrent,DriveRightCurrent,AutoCase,GyroHeading,DropSensor,BatteryVoltage,";
 		fout << "TargetValid,TargetHot,TargetDistance,TargetX,TargetY,TargetIsLeft,TargetIsRight,MatchTime,AutoInternalState,";
@@ -723,7 +721,7 @@ public:
 		fout << missionTimer->Get() << ",";
 #ifndef DISABLE_SHOOTER
 		myCam->log(fout);
-#endif
+#endif //Ends DISABLE_SHOOTER
 		myDrive->log(fout);
 		CurrentSensorSlot * slots[4] = { camMotor1Slot, camMotor2Slot,
 				driveLeftSlot, driveRightSlot };
