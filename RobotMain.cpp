@@ -17,7 +17,7 @@
 #include "Target.h"
 #include "DropSensor.h"
 
-#define DISABLE_SHOOTER
+//#define DISABLE_SHOOTER
 //#define DISABLE_AUTONOMOUS
 //TODO: Implement stub version of shooter class
 

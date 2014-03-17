@@ -2,7 +2,7 @@
 # CAM PID
 cam_p = .08
 cam_i = .0001
-cam_d = .002
+cam_d = .2
 
 # Robot Loop period
 robot_loop_period = .02
@@ -10,7 +10,7 @@ robot_loop_period = .02
 # CAM
 cam_loop_period = 0.004
 robot_cam_rearm_rate = 25
-cam_ready_to_fire_position = 53
+cam_ready_to_fire_position = 54
 cam_fire_to_position = 63
 cam_point_of_no_return = 58
 cam_fire_position_tolerance = 1
