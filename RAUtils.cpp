@@ -16,5 +16,5 @@ float round_to(float x, int positions)
 	float temp = x * pow10;
 	
 	// this may be vxworks-specific
-	return ::roundf(temp) / pow10;
+	return ::floor(temp + .5) / pow10;
 }

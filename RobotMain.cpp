@@ -16,6 +16,7 @@
 #include "Collection.h"
 #include "Target.h"
 #include "DropSensor.h"
+#include "RAUtils.h"
 
 //#define DISABLE_SHOOTER
 //#define DISABLE_AUTONOMOUS
