@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+float round_to(float x, int digits = 2);
 #ifndef RA_NDEBUG
 #define RA_DEBUG(expr) (::fprintf(stderr, #expr " = %g\n", expr))
 #else

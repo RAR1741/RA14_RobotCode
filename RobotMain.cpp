@@ -689,9 +689,12 @@ public:
 	 * the robot enters test mode.
 	 */
 	void RA14Robot::TestInit() {
+		myCam->Disable();
 		myCompressor->Start();
 		Config::LoadFromFile("config.txt");
 		Config::Dump();
+		
+		myCamera->Set(Relay::kForward); // turn on light
 	}
 
 	/**
@@ -702,7 +705,29 @@ public:
 	 */
 	void RA14Robot::TestPeriodic() {
 		StartOfCycleMaintenance();
-
+		
+		std::string packet = server->GetLatestPacket();
+		
+		target->Parse( packet );
+		
+		if (target->IsValid()) {
+			cout << "target: " << round_to(target->GetX(),2) << "," << round_to(target->GetY(), 2);
+			cout << " distance " << round_to(target->GetDistance(), 2) << " ft";
+			
+			if (target->IsHot()) {
+				cout << " HOT ";
+			}
+			if (target->IsLeft()) {
+				cout << " LEFT ";
+			}
+			if (target->IsRight()) {
+				cout << " RIGHT ";
+			}
+		} else {
+			cout << "No target, latest is " << packet;
+		}
+		
+		cout << endl;
 		EndOfCycleMaintenance();
 	}
 
