@@ -303,6 +303,7 @@ public:
 	 */
 	void RA14Robot::AutonomousInit() {
 		alreadyInitialized = true;
+		auto_timer->Reset();
 		auto_timer->Start();
 		missionTimer->Start();
 		myDrive->ResetOdometer();
@@ -399,7 +400,7 @@ public:
 			case 2:
 #ifndef DISABLE_SHOOTER
 			myCam->Process(false,false,false);
-			if(auto_timer->Get() >= 5.0)
+			if(auto_timer->Get() >= 4.0)
 			{
 				myCam->Process(true,false,false);
 			}
@@ -415,14 +416,14 @@ public:
 				myDrive->Drive(0,0);
 				cout << "FIRING" << endl;
 			}*/
-			if(auto_timer->Get() < 6.0)
+			if(auto_timer->Get() < 5.0)
 			{
 				cout<<"Waiting....."<<endl;
 			}
 			else
 			{
 				cout<<"Distance traveled: "<<myDrive->GetOdometer()<<" inches"<<endl;
-				myDrive->Drive(-.3, -.3);
+				myDrive->Drive(-.5, -.5);
 			}
 				
 			break;
@@ -518,6 +519,7 @@ public:
 		alreadyInitialized = true;
 		missionTimer->Start();
 		myDrive->ResetOdometer();
+		myDrive->ShiftUp();
 		//myOdometer->Reset();
 		if (!fout.is_open()) {
 			cout << "Opening logging.csv..." << endl;
