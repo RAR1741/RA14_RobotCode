@@ -303,6 +303,7 @@ public:
 	 */
 	void RA14Robot::AutonomousInit() {
 		alreadyInitialized = true;
+		auto_timer->Start();
 		missionTimer->Start();
 		myDrive->ResetOdometer();
 		myCamera->Set(Relay::kForward);
@@ -358,7 +359,7 @@ public:
 						myDrive->Drive(0,0);
 						cout << "FIRING" << endl;
 #ifndef DISABLE_SHOOTER
-						myCam->Process(1,0);
+						myCam->Process(1,0,0);
 #endif //Ends DISABLE_SHOOTER
 					}
 				/*}
@@ -383,7 +384,7 @@ public:
 					{
 						cout << "FIRING" << endl;
 #ifndef DISABLE_SHOOTER
-						myCam->Process(1,0);
+						myCam->Process(1,0,0);
 #endif //Ends DISABLE_SHOOTER
 					}
 				}
@@ -396,7 +397,15 @@ public:
 			break;
 			
 			case 2:
-			if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+#ifndef DISABLE_SHOOTER
+			myCam->Process(false,false,false);
+			if(auto_timer->Get() >= 5.0)
+			{
+				myCam->Process(true,false,false);
+			}
+#endif //Ends DISABLE_SHOOTER
+			
+			/*if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
 			{
 				cout<<"Distance traveled: "<<myDrive->GetOdometer()<<" inches"<<endl;
 				myDrive->Drive(corrected, speed);
@@ -405,10 +414,17 @@ public:
 			{
 				myDrive->Drive(0,0);
 				cout << "FIRING" << endl;
-#ifndef DISABLE_SHOOTER
-				myCam->Process(1,0);
-#endif //Ends DISABLE_SHOOTER
+			}*/
+			if(auto_timer->Get() < 6.0)
+			{
+				cout<<"Waiting....."<<endl;
 			}
+			else
+			{
+				cout<<"Distance traveled: "<<myDrive->GetOdometer()<<" inches"<<endl;
+				myDrive->Drive(-.3, -.3);
+			}
+				
 			break;
 			
 			case 3:
