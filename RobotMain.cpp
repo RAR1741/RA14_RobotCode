@@ -302,6 +302,7 @@ public:
 	 * the robot enters autonomous mode.
 	 */
 	void RA14Robot::AutonomousInit() {
+		Config::LoadFromFile("config.txt");
 		alreadyInitialized = true;
 		auto_timer->Reset();
 		auto_timer->Start();
@@ -344,6 +345,55 @@ public:
 #ifndef DISABLE_AUTONOMOUS
 		switch(auto_case)
 		{
+			case 0:
+				// start master autonomous mode
+				switch (auto_state) {
+				case 0: // start
+					auto_timer->Reset();
+					auto_timer->Start();
+					myCam->Process(false, false, false);
+					break;
+				case 1:
+					myCam->Process(false, false, false);
+					if (target->IsValid()) {
+						auto_state = 2;
+					} else if (auto_timer->Get() >= Config::GetSetting("auto_target_timeout", 1)) {
+						auto_state = 10;
+					}
+					break;
+				case 2:
+					myCam->Process(false, false, false);
+					if (target->IsHot()) {
+						auto_state = 10;
+					} else {
+						if (auto_timer->Get() >= Config::GetSetting("auto_target_hot_timeout", 5)) {
+							auto_state = 10;
+						}
+					}
+					break;
+				case 10:
+					myCam->Process(true, false, false);
+					if (myCam->IsReadyToRearm()) {
+						auto_state = 11;
+					}
+					break;
+				case 11:
+					myCam->Process(false, false, false);
+					myDrive->DriveArcade(corrected, speed);
+					if (myDrive->GetOdometer() >= Config::GetSetting("auto_drive_distance", 100))
+					{
+						myDrive->Drive(0,0);
+					}
+					break;
+				case 12:
+					myDrive->Drive(0,0);
+					break;
+				default:
+					cout << "Unknown state #" << auto_state << endl; 
+					break;
+				}
+				// end master autonomous mode
+				break;
 			case 1:
 			if( target->IsHot() && target->IsValid() )
 			{

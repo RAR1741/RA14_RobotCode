@@ -174,6 +174,7 @@ void CamShooter::DisablePID()
 
 bool CamShooter::IndexTripped() 
 {
+	
 	bool index_tripped = false;
 	
 	CRITICAL_REGION(AccessSemaphore)

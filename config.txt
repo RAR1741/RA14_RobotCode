@@ -15,20 +15,21 @@ robot_loop_period = .02
 cam_loop_period = 0.004
 robot_cam_rearm_rate = 25
 
-#cam_ready_to_fire_position = 52
-#cam_fire_to_position = 61
-#cam_point_of_no_return = 56
+cam_ready_to_fire_position = 46.7
+cam_point_of_no_return = 51
+cam_fire_to_position = 52.3
 
-cam_ready_to_fire_position = 53
-cam_fire_to_position = 62
-cam_point_of_no_return = 57
+#cam_ready_to_fire_position = 53
+#cam_fire_to_position = 62
+#cam_point_of_no_return = 57
 
-cam_fire_position_tolerance = 1
+#cam_fire_position_tolerance = 1 //This was the original value, changed to 3 to make more responsive
+cam_fire_position_tolerance = 3
 cam_setpoint_error_limit = 25
 cam_home_speed = .6
 cam_home_speed_slow = .25
 cam_home_speed_cutoff = 50
-cam_eject_position = 33
+cam_eject_position = 27
 
 #Odometer stuff
 auto_firing_distance = 96 #Distance from the goal that robot will be shooting from in inches
@@ -40,6 +41,10 @@ auto_case = 2
 auto_heading_p = .2
 auto_speed = -.3
 auto_firing_distance = 132
+auto_drive_distance = 100
+auto_target_timeout = 1.0
+auto_target_hot_timeout = 5.0
+
 # collection
 intake_roller_speed = 1
 
