@@ -550,7 +550,7 @@ public:
 			
 			break;
 			
-			case 4:	/* Drive forward specific distance, stop then shoot.*/
+			case 4:	/* One ball Autonomous - Drive forward specific distance, stop then shoot.*/
 #ifndef DISABLE_SHOOTER
 		
 					switch(auto_state) {
@@ -568,22 +568,273 @@ public:
 							auto_state = 2;
 							break;
 						case 2:		// Continue driving until required distance
-							if(myDrive->GetOdometer() >= Config::GetSetting("auto_drive_distance", 96))
-							{
+							if(myDrive->GetOdometer() >= Config::GetSetting("auto_drive_distance", 96)) {
 								myDrive->Drive(0, 0);
 								auto_state = 3;
 							}
 							break;
 						case 3:		// Fire launcher
 							myCam->Process(true,false,false);
+							auto_state = 4;
+							break;
+						case 4:		// Idle state
 							break;
 					}
 			
 #endif //Ends DISABLE_SHOOTER
 			
 			break;
-		
+			
+			case 5:	// Two Ball Autonomous - Drag ball 2 while driving forward specific distance, stop then shoot, load shoot next ball
+#ifndef DISABLE_SHOOTER
+				// By Hugh Meyer - April 1, 2014
+				
+					switch(auto_state) {
+				
+						case 0:		// Set low gear, reset odometer, extend pickup arm, set launcher ready to fire, set wait timer
+							myDrive->ShiftDown();				// Shift to low gear
+							myDrive->ResetOdometer();			// Reset odometer to zero
+							myCollection->ExtendArm();			// Extend arm to pickup position
+							myCam->Process(false,true,false);	// Set launcher to ready to fire position
+							auto_timer->Reset();				// Set timer to zero
+							auto_timer->Start();				// Start the timer for a short delay while pickup extends
+							auto_state = 1;						// Go on  to next state
+							break;
+						case 1:		// Wait for timer to expire - Let arm get extended and stabalized
+							if (auto_timer->HasPeriodPassed( Config::GetSetting("auton5_extend_delay", 1.0) )) {
+								auto_state = 2;
+							}
+							break;
+						case 2:		// Activate pickup roller motor to drag speed, start driving forward
+							myCollection->SpinMotor(Config::GetSetting("auton5_drag_speed", 0.3));	// Start motor to drag ball 2
+							myDrive->Drive(lDrive, rDrive);		// Drive straight
+							auto_state = 3;
+							break;
+						case 3:		// Continue driving until required distance, stop driving, stop pickup roller motor
+							if(myDrive->GetOdometer() >= Config::GetSetting("auton5_drive_distance", 96.0))
+							{
+								myCollection->SpinMotor(0);		// Stop collector pickup motor
+								myDrive->Drive(0, 0);			// Stop driving
+								auto_state = 4;					// On to next state
+							}
+							break;	
+						case 4:		// Fire launcher to shoot first ball, set wait timer
+							myCam->Process(true,false,false);	// Fire ball # 1
+							auto_timer->Reset();				// Set timer to zero
+							auto_timer->Start();				// Start the timer for a short delay while ball launches
+							auto_state = 5;						// On to next state
+							break;
+						case 5:		// Wait for timer to expire after ball one launches
+							if (auto_timer->HasPeriodPassed( Config::GetSetting("auton5_ball_1_launch_delay", 1.0) )) {
+								auto_state = 6;					// On to next state
+							}
+							break;
+						case 6:		// set launcher ready to fire for ball 2, set wait timer
+							myCam->Process(false,true,false);	// Set launcher to ready to fire position
+							auto_timer->Reset();				// Set timer to zero
+							auto_timer->Start();				// Start the timer for a short delay while ball launches
+							auto_state = 7;						// On to next state
+							break;
+						case 7:		// Wait for timer to expire
+							if (auto_timer->HasPeriodPassed( Config::GetSetting("auton5_ball_2_ready2fire_delay", 1.0) )) {
+								auto_state = 8;					// Wait for launcher to get ready to accept ball 2
+							}
+							break;
+						case 8:		// Activate pickup roller motor to load ball 2, set wait timer
+							myCollection->SpinMotor(Config::GetSetting("auton5_intake_roller_speed", 0.7));
+							auto_timer->Reset();				// Set timer to zero
+							auto_timer->Start();				// Start the timer for a short delay while ball 2 loads
+							auto_state = 9;						// On to next state
+							break;
+						case 9:		// Wait for timer to expire while ball 2 gets collected into launcher
+							if (auto_timer->HasPeriodPassed( Config::GetSetting("auton5_ball_2_settle_delay", 1.0) )) {
+								auto_state = 10;				// Wait for ball 2 to be collected and settle
+							}
+							break;
+						case 10:	// Fire launcher to shoot second ball
+							myCam->Process(true,false,false);	// Fire ball # 2
+							auto_state = 11;					// All done so go to idle state
+							break;
+						case 11:	// Idle state
+							auto_state = 11;
+							break;
+/*						case 12:	// More states if we need them for changes.
+							auto_state = 13;
+							break;
+						case 13:	// 
+							auto_state = 14;
+							break;
+						case 14:	// 
+							auto_state = 15;
+							break;
+						case 15:	// 
+							auto_state = 15;
+							break;
+*/
+					}
+					
+#endif //Ends DISABLE_SHOOTER
+					
+			break;
+				
+			
+			case 6:	// Two Ball Autonomous - Drive forward specific distance, stop then shoot, backup get second ball, drive, shoot
+#ifndef DISABLE_SHOOTER
+				// By Hugh Meyer - April 1, 2014
+					
+					switch(auto_state) {
 						
+						case 0:		// Set low gear, reset odometer, extend pickup arm, set launcher ready to fire
+							myDrive->ShiftDown();				// Shift to low gear
+							myDrive->ResetOdometer();			// Reset odometer to zero
+							myCollection->ExtendArm();			// Extend arm to pickup position
+							myCam->Process(false,true,false);	// Set launcher to ready to fire position
+							auto_state = 1;						// Go on to next state
+							break;
+						case 1:		// Drive forward
+							myDrive->Drive(lDrive, rDrive);
+							auto_state = 2;						// On to next state
+							break;
+						case 2:		// Continue driving forward until the specific distance is traveled
+							if(myDrive->GetOdometer() >= Config::GetSetting("auton6_drive_forward_distance", 96.0)) {
+								myDrive->Drive(0, 0);
+								auto_state = 3;
+							}
+							break;
+						case 3:		// Fire launcher to launch first ball, set timer
+							myCam->Process(true,false,false);	// Launch ball # 1
+							auto_timer->Reset();				// Set timer to zero
+							auto_timer->Start();				// Start the timer for a short delay while ball launches
+							auto_state = 4;						// On to next state
+							break;	
+						case 4:		// Wait for timer while ball launcher fires
+							if (auto_timer->HasPeriodPassed( Config::GetSetting("auton6_ball_1_fire_delay", 1.0) )) {
+								auto_state = 5;					// On to next state
+							}
+							break;
+						case 5:		// Reset Odometer, Drive backwards, set launcher to ready to fire position, turn on pickup
+							myDrive->ResetOdometer();				// Reset odometer to zero
+							myDrive->Drive(-1*lDrive, -1*rDrive);	// Drive backwards
+							myCam->Process(false,true,false);		// Set launcher to ready to fire position
+							myCollection->SpinMotor(Config::GetSetting("auton6_intake_roller_speed", 0.7));	// Turn on pickup
+							auto_state = 6;						// On to next state
+							break;
+						case 6:		// Continue driving backwards a specific distance
+							if(myDrive->GetOdometer() <= Config::GetSetting("auton6_drive_distance", -96.0)) {
+								auto_state = 7;					// On to next state
+							}
+							break;
+						case 7:		// Set timer
+							auto_timer->Reset();				// Set timer to zero
+							auto_timer->Start();				// Start the timer for a short delay while ball launches
+							auto_state = 8;						// On to next state
+							break;
+						case 8:		// Wait for timer while ball loads and settles
+							if (auto_timer->HasPeriodPassed( Config::GetSetting("auton6_ball_2_load_delay", 1.0) )) {
+								auto_state = 9;					// On to next state
+							}
+							break;
+						case 9:		// Drive forwards
+							myDrive->Drive(lDrive, rDrive);
+							auto_state = 10;					// On to next state
+							break;
+						case 10:	// Continue driving forward until the specific distance is traveled
+							if(myDrive->GetOdometer() >= Config::GetSetting("auton6_drive_forward_distance", 96.0)) {
+								myDrive->Drive(0, 0);
+								auto_state = 11;				// On to next state
+							}
+							break;
+						case 11:	// Fire launcher to launch second ball
+							myCam->Process(true,false,false);	// Launch ball # 2
+							auto_state = 15;					// On to next state
+							break;
+/*						case 12:	// 
+							auto_state = 13;					// On to next state
+							break;
+						case 13:	// 
+							auto_state = 14;					// On to next state
+							break;
+						case 14:	// 
+							auto_state = 15;					// All done so go to idle state
+							break;
+*/
+						case 15:	// Idle state
+							auto_state = 15;
+							break;
+
+					}
+							
+#endif //Ends DISABLE_SHOOTER
+							
+			break;
+/*			
+			
+			case 7:	// Extra structure for more changes
+#ifndef DISABLE_SHOOTER
+				// By Hugh Meyer - April 1, 2014
+					
+					switch(auto_state) {
+						
+						case 0:		// Set low gear, reset odometer, extend pickup arm, set launcher ready to fire, drive foward
+							myDrive->ShiftDown();				// Shift to low gear
+							myDrive->ResetOdometer();			// Reset odometer to zero
+							myCollection->ExtendArm();			// Extend arm to pickup position
+							myCam->Process(false,true,false);	// Set launcher to ready to fire position
+							myDrive->Drive(lDrive, rDrive);		// Drive straight
+							auto_state = 1;						// Go on  to next state
+							break;
+						case 1:		// 
+							auto_state = 2;						// On to next state
+							break;
+						case 2:		// 
+							auto_state = 3;						// On to next state
+							break;
+						case 3:		// 
+							auto_state = 4;						// On to next state
+							break;	
+						case 4:		// 
+							auto_state = 5;						// On to next state
+							break;
+						case 5:		// 
+							auto_state = 6;						// On to next state
+							break;
+						case 6:		// 
+							auto_state = 7;						// On to next state
+							break;
+						case 7:		// 
+							auto_state = 8;						// On to next state
+							break;
+						case 8:		// 
+							auto_state = 9;						// On to next state
+							break;
+						case 9:		// 
+							auto_state = 10;					// On to next state
+							break;
+						case 10:	// 
+							auto_state = 11;					// On to next state
+							break;
+						case 11:	// 
+							auto_state = 12;					// On to next state
+							break;
+						case 12:	// 
+							auto_state = 13;					// On to next state
+							break;
+						case 13:	// 
+							auto_state = 14;					// On to next state
+							break;
+						case 14:	// 
+							auto_state = 15;					// All done so go to idle state
+							break;
+						case 15:	// Idle state
+							auto_state = 15;
+							break;
+					}
+								
+#endif //Ends DISABLE_SHOOTER
+									
+			break;
+*/								
+			
 			default:
 			cout<<"Error in autonomous, unrecognized case: "<<auto_case<<endl;
 		}

@@ -45,6 +45,22 @@ auto_drive_distance = 96
 auto_target_timeout = 1.0
 auto_target_hot_timeout = 5.0
 
+# Autonomous mode 5 variables - Two ball drag mode
+auton5_extend_delay = 1.5
+auton5_drag_speed = 0.3
+auton5_drive_distance = 96.0
+auton5_ball_1_launch_delay = 1.5
+auton5_ball_2_ready2fire_delay = 1.5
+auton5_intake_roller_speed = 1.0
+auton5_ball_2_settle_delay = 1.0
+
+# Autonomous mode 6 variables - Two ball retrieve mode
+auton6_drive_forward_distance = 96.0
+auton6_ball_1_fire_delay = 1.0
+auton6_intake_roller_speed = 1.0
+auton6_ball_2_load_delay = 1.0
+
+
 # collection
 intake_roller_speed = 1
 
