@@ -564,7 +564,8 @@ public:
 							break;
 						case 1:		// Start driving forward
 							// myDrive->Drive(-.5, -.5);
-							myDrive->Drive(lDrive, rDrive);
+							//myDrive->Drive(lDrive, rDrive);
+							myDrive->DriveArcade(corrected, speed);
 							auto_state = 2;
 							break;
 						case 2:		// Continue driving until required distance
@@ -608,7 +609,7 @@ public:
 							break;
 						case 2:		// Activate pickup roller motor to drag speed, start driving forward
 							myCollection->SpinMotor(Config::GetSetting("auton5_drag_speed", 0.3));	// Start motor to drag ball 2
-							myDrive->Drive(lDrive, rDrive);		// Drive straight
+							myDrive->DriveArcade(corrected, speed);		// Drive straight
 							auto_state = 3;
 							break;
 						case 3:		// Continue driving until required distance, stop driving, stop pickup roller motor
@@ -693,7 +694,7 @@ public:
 							auto_state = 1;						// Go on to next state
 							break;
 						case 1:		// Drive forward
-							myDrive->Drive(lDrive, rDrive);
+							myDrive->DriveArcade(corrected, speed);
 							auto_state = 2;						// On to next state
 							break;
 						case 2:		// Continue driving forward until the specific distance is traveled
@@ -715,7 +716,7 @@ public:
 							break;
 						case 5:		// Reset Odometer, Drive backwards, set launcher to ready to fire position, turn on pickup
 							myDrive->ResetOdometer();				// Reset odometer to zero
-							myDrive->Drive(-1*lDrive, -1*rDrive);	// Drive backwards
+							myDrive->DriveArcade(corrected, -1 * speed);	// Drive backwards
 							myCam->Process(false,true,false);		// Set launcher to ready to fire position
 							myCollection->SpinMotor(Config::GetSetting("auton6_intake_roller_speed", 0.7));	// Turn on pickup
 							auto_state = 6;						// On to next state
@@ -736,7 +737,7 @@ public:
 							}
 							break;
 						case 9:		// Drive forwards
-							myDrive->Drive(lDrive, rDrive);
+							myDrive->DriveArcade(corrected, speed);
 							auto_state = 10;					// On to next state
 							break;
 						case 10:	// Continue driving forward until the specific distance is traveled
