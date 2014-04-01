@@ -590,6 +590,7 @@ public:
 				// By Hugh Meyer - April 1, 2014
 				
 					switch(auto_state) {
+					cout << "Executing mr m's auton" << endl;
 				
 						case 0:		// Set low gear, reset odometer, extend pickup arm, set launcher ready to fire, set wait timer
 							myDrive->ShiftDown();				// Shift to low gear

@@ -37,7 +37,7 @@ auto_collection_delay = 1.0
 auto_speed = -.1
 
 # Autonomous
-auto_case = 4
+auto_case = 5
 auto_heading_p = 0.01
 auto_speed = -.3
 auto_firing_distance = 132
@@ -51,12 +51,12 @@ xaxis_percent = .75
 
 # Autonomous mode 5 variables - Two ball drag mode
 auton5_extend_delay = 1.5
-auton5_drag_speed = 0.3
+auton5_drag_speed = -0.15
 auton5_drive_distance = 96.0
 auton5_ball_1_launch_delay = 1.5
 auton5_ball_2_ready2fire_delay = 1.5
-auton5_intake_roller_speed = 1.0
-auton5_ball_2_settle_delay = 1.0
+auton5_intake_roller_speed = -0.7
+auton5_ball_2_settle_delay = 2
 
 # Autonomous mode 6 variables - Two ball retrieve mode
 auton6_drive_forward_distance = 96.0
