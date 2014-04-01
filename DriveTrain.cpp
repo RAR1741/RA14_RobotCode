@@ -76,6 +76,8 @@ void DriveTrain::DriveArcade(float x, float y)
 	float leftOut = 0;
 	float rightOut = 0;
 	
+	x = x * xaxis_percent;
+	
 	if(reverseDriving)
 	{
 		//x = x*-1;

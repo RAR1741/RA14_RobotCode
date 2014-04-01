@@ -6,6 +6,8 @@
 #ifndef DRIVE_H__
 #define DRIVE_H__
 
+#define xaxis_percent ( Config::GetSetting("xaxis_percent", .75) )
+
 class DriveTrain
 {
 public:

@@ -45,6 +45,10 @@ auto_drive_distance = 96
 auto_target_timeout = 1.0
 auto_target_hot_timeout = 5.0
 
+#Driving variables
+xaxis_percent = .75
+
+
 # Autonomous mode 5 variables - Two ball drag mode
 auton5_extend_delay = 1.5
 auton5_drag_speed = 0.3
@@ -63,6 +67,9 @@ auton6_ball_2_load_delay = 1.0
 
 # collection
 intake_roller_speed = 1
+
+#Driving variables
+xaxis_percent = .75
 
 # Camera meta-config (meant for dashboard, not robot)
 target_r = 55
