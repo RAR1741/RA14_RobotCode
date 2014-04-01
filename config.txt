@@ -37,11 +37,11 @@ auto_collection_delay = 1.0
 auto_speed = -.1
 
 # Autonomous
-auto_case = 2
-auto_heading_p = .2
+auto_case = 4
+auto_heading_p = 0.01
 auto_speed = -.3
 auto_firing_distance = 132
-auto_drive_distance = 100
+auto_drive_distance = 96
 auto_target_timeout = 1.0
 auto_target_hot_timeout = 5.0
 

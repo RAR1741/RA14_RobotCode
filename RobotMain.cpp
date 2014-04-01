@@ -93,6 +93,7 @@ public:
 		DriverLeftY = 0.0;
 		DriverRightY = 0.0;
 		auto_case = 0;
+		auto_state = 0;
 		DriverLeftBumper = true;
 		DriverRightBumper = true;
 		CurrentSensorReset = NULL;
@@ -318,6 +319,7 @@ public:
 			fout.open("logging.csv");
 			logheaders();
 		}
+		auto_state = 0;
 #ifndef DISABLE_SHOOTER
 		myCam->Reset();
 		myCam->Enable();
@@ -338,9 +340,18 @@ public:
 		float angle = gyro->GetAngle();
 		
 		float error = targetHeading - angle;
-		float corrected = error * -1 * Config::GetSetting("auto_heading_p", .01);
+		float corrected = -1 * error * Config::GetSetting("auto_heading_p", .01);
+		//float corrected = error * Config::GetSetting("auto_heading_p", .01);
 		cout<<"Gyro angle: "<<angle<<endl;
-		cout <<"Corrected: " << corrected << endl;
+		cout <<"Error: " << error << endl;
+		//float lDrive = Config::GetSetting("auto_speed", -0.3) + (error * Config::GetSetting("auto_heading_p", .01));
+		//float rDrive = Config::GetSetting("auto_speed", -0.3) - (error * Config::GetSetting("auto_heading_p", .01));
+		// Reading p value from the config file does not appear to be working. When we get p from config, the math is not correct.
+		float lDrive = Config::GetSetting("auto_speed", -0.3) + (error*0.01);
+		float rDrive = Config::GetSetting("auto_speed", -0.3) - (error*0.01);
+		cout << "Left: " << lDrive << endl;
+		cout << "Right: " << rDrive << endl;
+									
 		
 #ifndef DISABLE_AUTONOMOUS
 		switch(auto_case)
@@ -395,12 +406,12 @@ public:
 				// end master autonomous mode
 				break;
 			case 1:
-			if( target->IsHot() && target->IsValid() )
-			{
-				cout << "Target is HOTTT taking the shot" << endl;
-				//Drive forward and shoot right away
-				//if( target->IsLeft() || target->IsRight() )
-				//{
+				if( target->IsHot() && target->IsValid() )
+				{
+					cout << "Target is HOTTT taking the shot" << endl;
+					//Drive forward and shoot right away
+					//if( target->IsLeft() || target->IsRight() )
+					//{
 					if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
 					{
 						myDrive->Drive(corrected,speed);
@@ -418,34 +429,34 @@ public:
 				{
 					cout<<"Error"<<endl;
 				}*/
-			}
-			else if(target->IsValid())
-			{
-				cout << "Target is valid, but cold. Driving and waiting" << endl;
-				//Drive forward and wait to shoot 
-				if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+				}
+				else if(target->IsValid())
 				{
-					myDrive->Drive(corrected, speed);
+					cout << "Target is valid, but cold. Driving and waiting" << endl;
+					//Drive forward and wait to shoot 
+					if(myDrive->GetOdometer() <= 216 - Config::GetSetting("auto_firing_distance", 96)) //216 is distance from robot to goal
+					{
+						myDrive->Drive(corrected, speed);
+					}
+					else
+					{
+						// now at the firing spot.
+						myDrive->Drive(0,0);
+						if( target->IsHot() )
+						{
+							cout << "FIRING" << endl;
+#ifndef DISABLE_SHOOTER
+							myCam->Process(1,0,0);
+#endif //Ends DISABLE_SHOOTER
+						}
+					}
 				}
 				else
 				{
-					// now at the firing spot.
-					myDrive->Drive(0,0);
-					if( target->IsHot() )
-					{
-						cout << "FIRING" << endl;
-#ifndef DISABLE_SHOOTER
-						myCam->Process(1,0,0);
-#endif //Ends DISABLE_SHOOTER
-					}
+					//Not valid
+					cout << "Not valid target." << endl;
 				}
-			}
-			else
-			{
-				//Not valid
-				cout << "Not valid target." << endl;
-			}
-			break;
+				break;
 			
 			case 2:
 #ifndef DISABLE_SHOOTER
@@ -539,6 +550,40 @@ public:
 			
 			break;
 			
+			case 4:	/* Drive forward specific distance, stop then shoot.*/
+#ifndef DISABLE_SHOOTER
+		
+					switch(auto_state) {
+		
+						case 0:		//Reset odometer, lower the arm and set launcher to ready to fire
+							myDrive->ShiftDown();
+							myDrive->ResetOdometer();
+							myCollection->ExtendArm();
+							myCam->Process(false,true,false);
+							auto_state = 1;
+							break;
+						case 1:		// Start driving forward
+							// myDrive->Drive(-.5, -.5);
+							myDrive->Drive(lDrive, rDrive);
+							auto_state = 2;
+							break;
+						case 2:		// Continue driving until required distance
+							if(myDrive->GetOdometer() >= Config::GetSetting("auto_drive_distance", 96))
+							{
+								myDrive->Drive(0, 0);
+								auto_state = 3;
+							}
+							break;
+						case 3:		// Fire launcher
+							myCam->Process(true,false,false);
+							break;
+					}
+			
+#endif //Ends DISABLE_SHOOTER
+			
+			break;
+		
+						
 			default:
 			cout<<"Error in autonomous, unrecognized case: "<<auto_case<<endl;
 		}
