@@ -617,9 +617,21 @@ public:
 							{
 								myCollection->SpinMotor(0);		// Stop collector pickup motor
 								myDrive->Drive(0, 0);			// Stop driving
-								auto_state = 4;					// On to next state
+								auto_state = 31;				// On to next state
 							}
-							break;	
+							break;
+						case 31: // slightly un-eject herded ball to avoid contact with launch ball
+							myCollection->SpinMotor(-1 * Config::GetSetting("auton5_drag_speed", 0.3));
+							auto_timer->Reset();
+							auto_timer->Start(); // setup timer to time un-eject
+							auto_state = 32;
+							break;
+						case 32: // once timer has run out, stop ejection and fire
+							if (auto_timer->HasPeriodPassed(Config::GetSetting("auton5_uneject_time", 0.25))) {
+								myCollection->SpinMotor(0); // stop spinner
+								auto_state = 4;
+							}
+							break;
 						case 4:		// Fire launcher to shoot first ball, set wait timer
 							myCam->Process(true,false,false);	// Fire ball # 1
 							auto_timer->Reset();				// Set timer to zero
@@ -651,6 +663,23 @@ public:
 						case 9:		// Wait for timer to expire while ball 2 gets collected into launcher
 							if (auto_timer->HasPeriodPassed( Config::GetSetting("auton5_ball_2_settle_delay", 1.0) )) {
 								auto_state = 10;				// Wait for ball 2 to be collected and settle
+							}
+							break;
+
+						case 19:	// Drive backwards a little bit, set wait timer
+							myDrive->DriveArcade(-1*corrected, -1*speed);		// Drive straight
+							auto_timer->Reset();				// Set timer to zero
+							auto_timer->Start();				// Start the timer for a short delay while ball launches
+							auto_state = 20;				// Wait for ball 2 to be collected and settle
+							break;
+		
+							
+						case 20:		// Wait for timer to expire while ball 2 gets collected into launcher
+							if (myDrive->GetOdometer() <= 
+									  Config::GetSetting("auton5_drive_distance", 96) 
+									- Config::GetSetting("auton5_backup_distance", 6))	{
+								myDrive->Drive(0,0);
+								auto_state = 10;
 							}
 							break;
 						case 10:	// Fire launcher to shoot second ball
