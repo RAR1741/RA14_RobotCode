@@ -15,13 +15,13 @@ robot_loop_period = .02
 cam_loop_period = 0.004
 robot_cam_rearm_rate = 25
 
-cam_ready_to_fire_position = 46.7
-cam_point_of_no_return = 51
-cam_fire_to_position = 52.3
+#cam_ready_to_fire_position = 47.7
+#cam_point_of_no_return = 52
+#cam_fire_to_position = 53.3
 
-#cam_ready_to_fire_position = 53
-#cam_fire_to_position = 62
-#cam_point_of_no_return = 57
+cam_ready_to_fire_position = 53
+cam_fire_to_position = 62
+cam_point_of_no_return = 57
 
 #cam_fire_position_tolerance = 1 //This was the original value, changed to 3 to make more responsive
 cam_fire_position_tolerance = 3
@@ -37,8 +37,8 @@ auto_collection_delay = 1.0
 auto_speed = -.1
 
 # Autonomous
-auto_case = 5
-auto_heading_p = 0.01
+auto_case = 4
+auto_heading_p = 0.03
 auto_speed = -.3
 auto_firing_distance = 132
 auto_drive_distance = 96
@@ -51,7 +51,7 @@ xaxis_percent = .75
 
 # Autonomous mode 5 variables - Two ball drag mode
 auton5_extend_delay = 1.5
-auton5_drag_speed = -0.15
+auton5_drag_speed = -0.12
 auton5_drive_distance = 96.0
 auton5_ball_1_launch_delay = 1.5
 auton5_ball_2_ready2fire_delay = 1.5
