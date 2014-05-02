@@ -336,9 +336,9 @@ public:
 		StartOfCycleMaintenance();
 
 		target->Parse(server->GetLatestPacket());
-		float speed = Config::GetSetting("auto_speed", .1);
+		float speed = Config::GetSetting("auto_speed", .5);
+		cout<<"Auto Speed: "<<Config::GetSetting("auto_speed", 0)<<endl; // original .1
 		float angle = gyro->GetAngle();
-		
 		float error = targetHeading - angle;
 		float corrected = -1 * error * Config::GetSetting("auto_heading_p", .01);
 		//float corrected = error * Config::GetSetting("auto_heading_p", .01);
@@ -744,14 +744,16 @@ public:
 							}
 							break;
 						case 5:		// Reset Odometer, Drive backwards, set launcher to ready to fire position, turn on pickup
+							cout<<"Corrected Values: "<<corrected<<endl; 
+							cout<<"Speed: "<< -1 * speed<<endl;
 							myDrive->ResetOdometer();				// Reset odometer to zero
-							myDrive->DriveArcade(corrected, -1 * speed);	// Drive backwards
+							myDrive->DriveArcade(-1* corrected, -1 * speed);	// Drive backwards
 							myCam->Process(false,true,false);		// Set launcher to ready to fire position
-							myCollection->SpinMotor(Config::GetSetting("auton6_intake_roller_speed", 0.7));	// Turn on pickup
+							myCollection->SpinMotor(-1 * Config::GetSetting("auton6_intake_roller_speed", 0.7));	// Turn on pickup
 							auto_state = 6;						// On to next state
 							break;
 						case 6:		// Continue driving backwards a specific distance
-							if(myDrive->GetOdometer() <= Config::GetSetting("auton6_drive_distance", -96.0)) {
+							if(myDrive->GetOdometer() <= -1 * Config::GetSetting("auton6_drive_forward_distance", -96.0)) {
 								auto_state = 7;					// On to next state
 							}
 							break;
@@ -763,13 +765,16 @@ public:
 						case 8:		// Wait for timer while ball loads and settles
 							if (auto_timer->HasPeriodPassed( Config::GetSetting("auton6_ball_2_load_delay", 1.0) )) {
 								auto_state = 9;					// On to next state
+								myDrive->ResetOdometer();
 							}
 							break;
 						case 9:		// Drive forwards
-							myDrive->DriveArcade(corrected, speed);
+							myDrive->DriveArcade(/*corrected*/ 0.01, speed);
 							auto_state = 10;					// On to next state
 							break;
 						case 10:	// Continue driving forward until the specific distance is traveled
+							cout << "I am driving forward: " << myDrive->GetOdometer() << endl;
+							myDrive->DriveArcade(0.01, speed);
 							if(myDrive->GetOdometer() >= Config::GetSetting("auton6_drive_forward_distance", 96.0)) {
 								myDrive->Drive(0, 0);
 								auto_state = 11;				// On to next state
@@ -794,6 +799,7 @@ public:
 							break;
 
 					}
+					cout << myDrive->GetOdometer() << endl;
 							
 #endif //Ends DISABLE_SHOOTER
 							
@@ -1029,7 +1035,7 @@ public:
 
 #ifndef DISABLE_SHOOTER
 		myCam->Process(ShouldFireButton, (OperatorGamepad->GetX() || DriverGamepad->GetX() ), DriverGamepad->GetB());
-		myCam->Debug(cout);
+		//myCam->Debug(cout);
 #endif //Ends DISABLE_SHOOTER
 		
 		//End Fire Control
