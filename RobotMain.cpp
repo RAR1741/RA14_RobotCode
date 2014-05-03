@@ -315,7 +315,8 @@ public:
 		cout<<"Reseting Gyro"<<endl;
 		gyro->Reset();
 		//myOdometer->Reset();
-		myDrive->ShiftDown();
+		myDrive->ShiftUp();
+		//shift to high gear
 		if (!fout.is_open()) {
 			cout << "Opening logging.csv..." << endl;
 			fout.open("logging.csv");
@@ -558,7 +559,7 @@ public:
 					switch(auto_state) {
 		
 						case 0:		//Reset odometer, lower the arm and set launcher to ready to fire
-							myDrive->ShiftDown();
+							myDrive->ShiftUp();
 							myDrive->ResetOdometer();
 							myCollection->ExtendArm();
 							myCam->Process(false,true,false);
@@ -596,7 +597,7 @@ public:
 					cout << "Executing mr m's auton" << endl;
 				
 						case 0:		// Set low gear, reset odometer, extend pickup arm, set launcher ready to fire, set wait timer
-							myDrive->ShiftDown();				// Shift to low gear
+							myDrive->ShiftUp();				// Shift to low gear
 							myDrive->ResetOdometer();			// Reset odometer to zero
 							myCollection->ExtendArm();			// Extend arm to pickup position
 							myCam->Process(false,true,false);	// Set launcher to ready to fire position

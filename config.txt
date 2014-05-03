@@ -38,8 +38,8 @@ odometer_auto_speed = -.1
 
 # Autonomous
 auto_case = 5
-auto_heading_p = 0.06
-auto_speed = -1.0 
+auto_heading_p = 0.075
+auto_speed = -0.6
 #0.5
 auto_firing_distance = 132
 auto_drive_distance = 100
