@@ -315,7 +315,8 @@ public:
 		cout<<"Reseting Gyro"<<endl;
 		gyro->Reset();
 		//myOdometer->Reset();
-		myDrive->ShiftUp();
+		//myDrive->ShiftUp();
+		myDrive->ShiftDown();
 		//shift to high gear
 		if (!fout.is_open()) {
 			cout << "Opening logging.csv..." << endl;
@@ -597,7 +598,8 @@ public:
 					cout << "Executing mr m's auton" << endl;
 				
 						case 0:		// Set low gear, reset odometer, extend pickup arm, set launcher ready to fire, set wait timer
-							myDrive->ShiftUp();				// Shift to low gear
+							//myDrive->ShiftUp();				// Shift to low gear
+							myDrive->ShiftDown();
 							myDrive->ResetOdometer();			// Reset odometer to zero
 							myCollection->ExtendArm();			// Extend arm to pickup position
 							myCam->Process(false,true,false);	// Set launcher to ready to fire position
@@ -605,14 +607,27 @@ public:
 							auto_timer->Start();				// Start the timer for a short delay while pickup extends
 							auto_state = 1;						// Go on  to next state
 							break;
+																			
 						case 1:		// Wait for timer to expire - Let arm get extended and stabalized
 							if (auto_timer->HasPeriodPassed( Config::GetSetting("auton5_extend_delay", 1.0) )) {
 								auto_state = 2;
 							}
 							break;
+						case 21: 	//reset gyro and reset timer
+							gyro->Reset();
+							auto_timer->Reset();
+							auto_timer->Start();
+							auto_state = 22;
+							break;
+						case 22:
+							if(auto_timer->HasPeriodPassed(Config::GetSetting("auton5_gyro_reset_delay", 2) )){
+								auto_state = 2;
+							}	
+							break;								
 						case 2:		// Activate pickup roller motor to drag speed, start driving forward
 							myCollection->SpinMotor(Config::GetSetting("auton5_drag_speed", 0.3));	// Start motor to drag ball 2
-							myDrive->DriveArcade(corrected, speed);		// Drive straight
+							//myDrive->DriveArcade(corrected, speed);		// Drive straight
+							myDrive->DriveArcade(0.0, speed);
 							auto_state = 3;
 							break;
 						case 3:		// Continue driving until required distance, stop driving, stop pickup roller motor
