@@ -622,7 +622,7 @@ public:
 							}
 							break;
 						case 31: // slightly un-eject herded ball to avoid contact with launch ball
-							myCollection->SpinMotor(-1 * Config::GetSetting("auton5_drag_speed", 0.3));
+							myCollection->SpinMotor(Config::GetSetting("auton5_eject_speed", 0.3));
 							auto_timer->Reset();
 							auto_timer->Start(); // setup timer to time un-eject
 							auto_state = 32;
@@ -683,8 +683,9 @@ public:
 								auto_state = 10;
 							}
 							break;
-						case 10:	// Fire launcher to shoot second ball
+						case 10:	// Fire launcher to shoot second ball and stop roller
 							myCam->Process(true,false,false);	// Fire ball # 2
+							myCollection->SpinMotor(0);			// Stop spinning the roller
 							auto_state = 11;					// All done so go to idle state
 							break;
 						case 11:	// Idle state
