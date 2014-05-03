@@ -304,6 +304,7 @@ public:
 	 */
 	void RA14Robot::AutonomousInit() {
 		Config::LoadFromFile("config.txt");
+		auto_case = (int) Config::GetSetting("auto_case", 1);
 		alreadyInitialized = true;
 		auto_timer->Reset();
 		auto_timer->Start();
