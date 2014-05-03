@@ -39,7 +39,7 @@ odometer_auto_speed = -.1
 # Autonomous
 auto_case = 5
 auto_heading_p = 0.04
-auto_speed = -1.0 #0.6
+auto_speed = -1.0 #-0.6 
 #0.5
 auto_firing_distance = 132
 auto_drive_distance = 100
@@ -68,6 +68,20 @@ auton6_drive_forward_distance = 96.0
 auton6_ball_1_fire_delay = 1.0
 auton6_intake_roller_speed = 1.0
 auton6_ball_2_load_delay = 1.0
+
+# Autonomous mode 7 variables - Two ball drag mode
+auton7_gyro_reset_delay = 2.0
+auton7_extend_delay = 1.0
+auton7_drag_speed = -0.39
+auton7_drive_distance = 108.0
+auton7_eject_speed = 0.0
+auton7_ball_1_launch_delay = 1.5
+auton7_ball_2_ready2fire_delay = 1.5
+auton7_intake_roller_speed = -0.7
+auton7_ball_2_settle_delay = 2.5
+auton7_uneject_time = 0.5
+auton7_backup_distance = 6
+
 
 
 # collection
