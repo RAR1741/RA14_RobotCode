@@ -312,6 +312,7 @@ public:
 		myDrive->ResetOdometer();
 		myCamera->Set(Relay::kForward);
 		myCollection->ExtendArm();
+		cout<<"Reseting Gyro"<<endl;
 		gyro->Reset();
 		//myOdometer->Reset();
 		myDrive->ShiftDown();
@@ -341,7 +342,7 @@ public:
 		cout<<"Auto Speed: "<<Config::GetSetting("auto_speed", 0)<<endl; // original .1
 		float angle = gyro->GetAngle();
 		float error = targetHeading - angle;
-		float corrected = -1 * error * Config::GetSetting("auto_heading_p", .01);
+		float corrected = error * Config::GetSetting("auto_heading_p", .01);
 		//float corrected = error * Config::GetSetting("auto_heading_p", .01);
 		cout<<"Gyro angle: "<<angle<<endl;
 		cout <<"Error: " << error << endl;
