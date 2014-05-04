@@ -346,7 +346,7 @@ public:
 		float error = targetHeading - angle;
 		float corrected = error * Config::GetSetting("auto_heading_p", .01);
 		//float corrected = error * Config::GetSetting("auto_heading_p", .01);
-		cout<<"Gyro angle: "<<angle<<endl;
+		cout <<"Gyro angle: "<<angle<<endl;
 		cout <<"Error: " << error << endl;
 		//float lDrive = Config::GetSetting("auto_speed", -0.3) + (error * Config::GetSetting("auto_heading_p", .01));
 		//float rDrive = Config::GetSetting("auto_speed", -0.3) - (error * Config::GetSetting("auto_heading_p", .01));
@@ -627,7 +627,7 @@ public:
 						case 2:		// Activate pickup roller motor to drag speed, start driving forward
 							myCollection->SpinMotor(Config::GetSetting("auton5_drag_speed", 0.3));	// Start motor to drag ball 2
 							//myDrive->DriveArcade(corrected, speed);		// Drive straight
-							myDrive->DriveArcade(0.0, speed);
+							myDrive->DriveArcade(0.0, Config::GetSetting("auton5_drive_speed", -0.7)); //Start driving forwards
 							auto_state = 3;
 							break;
 						case 3:		// Continue driving until required distance, stop driving, stop pickup roller motor

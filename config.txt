@@ -51,16 +51,17 @@ xaxis_percent = 1
 
 
 # Autonomous mode 5 variables - Two ball drag mode
+auton5_drive_speed = -1.0
 auton5_gyro_reset_delay = 2.0
 auton5_extend_delay = 1.0
 auton5_drag_speed = -0.4
-auton5_drive_distance = 126.0
+auton5_drive_distance = 120.0
 auton5_eject_speed = 0.0
-auton5_ball_1_launch_delay = 1.5
+auton5_ball_1_launch_delay = 0.5
 auton5_ball_2_ready2fire_delay = 1.5
 auton5_intake_roller_speed = -0.7
-auton5_ball_2_settle_delay = 2.3
-auton5_uneject_time = 0.5
+auton5_ball_2_settle_delay = 2.5
+auton5_uneject_time = 1.0
 auton5_backup_distance = 6
 
 # Autonomous mode 6 variables - Two ball retrieve mode
