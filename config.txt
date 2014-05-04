@@ -59,7 +59,7 @@ auton5_eject_speed = 0.0
 auton5_ball_1_launch_delay = 1.5
 auton5_ball_2_ready2fire_delay = 1.5
 auton5_intake_roller_speed = -0.7
-auton5_ball_2_settle_delay = 2.5
+auton5_ball_2_settle_delay = 2.3
 auton5_uneject_time = 0.5
 auton5_backup_distance = 6
 
